@@ -313,7 +313,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Roaming Hunter | On the roaming Latias / Latios's route, every encounter is it, and it never flees. |
 | Get Other Box Legendary | **Ruby / Sapphire.** As Champion, with Rayquaza and your version's legend in slots 1 and 2, the other one waits in the Cave of Origin. |
 | Get Eon Ticket | As Champion with Latias or Latios caught, talk to Dad at the Petalburg Gym. |
-| Get a Special Wish | Every Hoenn Pokémon up to #200 caught? Talk to Mom… Jirachi awaits. Catching it gives the **Aurora Ticket** to Birth Island and Deoxys (Ruby / Sapphire use Emerald's island, maps and triangle). |
+| Get a Special Wish | Every Hoenn Pokémon up to #200 caught? Talk to Mom… ??? awaits.|
 
 ## Johto Pokémon Helper
 
