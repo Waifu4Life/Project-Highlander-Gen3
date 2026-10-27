@@ -60,8 +60,6 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Screen Ratio | 16:9 |
 | Ball Shortcuts | Up: Poké Ball, Down: Ultra Ball, Left: Great Ball, Right: None |
 
-Changing a default never overwrites a setting you have already picked.
-
 Rows that don't concern the game you're playing are hidden (FireRed / LeafGreen-only rows don't show in Hoenn, Ruby / Sapphire-only rows don't show in Emerald, and so on).
 
 ---
@@ -289,13 +287,13 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 
 ## Fill Kanto Regional Dex
 
-**FireRed / LeafGreen only.** Every Kanto Pokémon in a single cartridge, no trading needed. Same rules as the Gen 1 mod, minus Mr. Fuji's extra Eevee and the Karate Master's other fighter (breeding covers those). Regional Dex only, on purpose.
+**FireRed / LeafGreen only.** Every Kanto Pokémon in a single cartridge, no trading needed. 
 
 | Option | How it works |
 |---|---|
 | Get Other Game Exclusives | Each exclusive pair (Ekans / Sandshrew, Oddish / Bellsprout, Psyduck / Slowpoke, Growlithe / Vulpix, Shellder / Staryu, Scyther / Pinsir and their evolutions) has a 50% chance to be the other game's. Both games get Electabuzz in the Power Plant and Magmar on Mt. Ember. |
 | Trade with Link C. | The Game Boy kid on his own in the Celadon Dept. Store trade-evolves Kadabra, Haunter, Graveler and Machoke with the trade and evolution scenes, then trades them back. |
-| Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, Deoxys and Celebi stay until you catch them. |
+| Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, etc. |
 | Get All Starters | With 8 badges, Oak offers the last Poké Ball. As Champion with Mewtwo first in your party, he gives you your rival's starter (Lv 5). |
 | Get Other Fossil | With 8 badges, Miguel on Mt. Moon B2F trades you the fossil you didn't pick. |
 | Get ??? | The final Pokémon. |
@@ -311,11 +309,11 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Infinite Tries for Rare PKMN | The Regis, Groudon, Kyogre, Rayquaza, Latias / Latios, Jirachi, Deoxys, Mew, Lugia, Ho-Oh and Sudowoodo stay until you catch them. |
 | Get All Starters | With 8 badges, the last starter waits on Birch's lab table. As Champion with Latias or Latios first in your party, Birch gives you your rival's starter (Lv 5). |
 | Get Other Fossil | **Ruby / Sapphire.** With 8 badges and your fully evolved fossil Pokémon first in the party, the Devon scientist gives you the other one. |
-| Get Other Deep Sea Item | Captain Stern trades the other Deep Sea item for the Storage Key. |
+| Get Other Deep Sea Item | With 8 badges, Captain Stern trades the other Deep Sea item for the Storage Key (but only if you have used it to get the TM). |
 | Roaming Hunter | On the roaming Latias / Latios's route, every encounter is it, and it never flees. |
 | Get Other Box Legendary | **Ruby / Sapphire.** As Champion, with Rayquaza and your version's legend in slots 1 and 2, the other one waits in the Cave of Origin. |
 | Get Eon Ticket | As Champion with Latias or Latios caught, talk to Dad at the Petalburg Gym. |
-| Get a Special Wish | Every Hoenn Pokémon up to #200 caught? Talk to Mom… Jirachi awaits. Catching it gives the **Aurora Ticket** to Birth Island and Deoxys (Ruby / Sapphire use Emerald's island, maps and triangle). |
+| Get a Special Wish | Every Hoenn Pokémon up to #200 caught? Talk to Mom… ??? awaits.|
 
 ## Johto Pokémon Helper
 
@@ -329,7 +327,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Get All Roaming Beasts | When your game's beast appears, the other two start roaming Kanto too. |
 | Roaming Hunter | On a roaming beast's route, every encounter is it, and it never flees. |
 | Obtain Mystic Ticket | Raikou, Entei and Suicune in slots 1, 2 and 3? Talk to Mom. The Navel Rock ship opens like the real event. |
-| Guardian of the Forest | With Lugia and Ho-Oh caught, Celebi waits in Viridian Forest… Follow it. It leaves the **Aurora Ticket** behind. |
+| Guardian of the Forest | With Lugia and Ho-Oh caught, ??? waits in Viridian Forest and wants to play a game. |
 
 **Ruby / Sapphire / Emerald**
 
@@ -354,6 +352,5 @@ This is a **BETA**, so feedback helps a lot. When reporting a bug, please includ
 
 ## Credits
 
-- **Ish** — Modern UI Suite, which Project Highlander started from
 - **poooooby** — Wilds of Hoenn; Jirachi and Deoxys HGSS overworld sprites used with permission (see Wilds of Hoenn's THIRD_PARTY_NOTICES.md for the art's original credits)
 - **Waifu4Life** — Project Highlander Gen3: menus, QoL, Regional Dex tools, Johto Pokémon Helper, rumble, integration
