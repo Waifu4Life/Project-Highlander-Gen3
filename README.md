@@ -287,7 +287,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 
 ## Fill Kanto Regional Dex
 
-**FireRed / LeafGreen only.** Every Kanto Pokémon in a single cartridge, no trading needed. Same rules as the Gen 1 mod, minus Mr. Fuji's extra Eevee and the Karate Master's other fighter (breeding covers those). Regional Dex only, on purpose.
+**FireRed / LeafGreen only.** Every Kanto Pokémon in a single cartridge, no trading needed. 
 
 | Option | How it works |
 |---|---|
