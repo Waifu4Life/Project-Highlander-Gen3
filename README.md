@@ -309,7 +309,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Infinite Tries for Rare PKMN | The Regis, Groudon, Kyogre, Rayquaza, Latias / Latios, Jirachi, Deoxys, Mew, Lugia, Ho-Oh and Sudowoodo stay until you catch them. |
 | Get All Starters | With 8 badges, the last starter waits on Birch's lab table. As Champion with Latias or Latios first in your party, Birch gives you your rival's starter (Lv 5). |
 | Get Other Fossil | **Ruby / Sapphire.** With 8 badges and your fully evolved fossil Pokémon first in the party, the Devon scientist gives you the other one. |
-| Get Other Deep Sea Item | Captain Stern trades the other Deep Sea item for the Storage Key. |
+| Get Other Deep Sea Item | With 8 badges, Captain Stern trades the other Deep Sea item for the Storage Key (but only if you have used it to get the TM). |
 | Roaming Hunter | On the roaming Latias / Latios's route, every encounter is it, and it never flees. |
 | Get Other Box Legendary | **Ruby / Sapphire.** As Champion, with Rayquaza and your version's legend in slots 1 and 2, the other one waits in the Cave of Origin. |
 | Get Eon Ticket | As Champion with Latias or Latios caught, talk to Dad at the Petalburg Gym. |
