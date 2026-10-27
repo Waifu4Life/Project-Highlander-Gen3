@@ -294,7 +294,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Get Other Game Exclusives | Each exclusive pair (Ekans / Sandshrew, Oddish / Bellsprout, Psyduck / Slowpoke, Growlithe / Vulpix, Shellder / Staryu, Scyther / Pinsir and their evolutions) has a 50% chance to be the other game's. Both games get Electabuzz in the Power Plant and Magmar on Mt. Ember. |
 | Trade with Link C. | The Game Boy kid on his own in the Celadon Dept. Store trade-evolves Kadabra, Haunter, Graveler and Machoke with the trade and evolution scenes, then trades them back. |
 | Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, etc. |
-| Get All Starters | With 8 badges, Oak offers the last Poké Ball. As Champion with Mewtwo first in your party, he gives you your rival's starter (Lv 5). |
+| Get All Starters | Two steps. **1.** With 8 badges, Oak offers the Poké Ball left on his table: the starter neither you nor your rival picked (your 2nd). **2.** Then, as Champion with Mewtwo first in your party, he gives you a baby of your rival's starter (Lv 5, your 3rd). |
 | Get Other Fossil | With 8 badges, Miguel on Mt. Moon B2F trades you the fossil you didn't pick. |
 | Get ??? | The final Pokémon. |
 
@@ -307,7 +307,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Get Other Game Exclusives | Ruby / Sapphire: Seedot / Lotad, Nuzleaf / Lombre, Mawile / Sableye, Zangoose / Seviper and Solrock / Lunatone each have a 50% chance to be the other version's. Emerald: Seviper → Zangoose and Solrock → Lunatone at 50%, and Surskit, Meditite, Medicham and Roselia get Ruby / Sapphire's slots. |
 | Trade with Link C. | The GameCube in your room trade-evolves Kadabra, Graveler, Machoke, Seadra (Dragon Scale) and Clamperl (DeepSeaTooth / DeepSeaScale), then trades them back. |
 | Infinite Tries for Rare PKMN | The Regis, Groudon, Kyogre, Rayquaza, Latias / Latios, Jirachi, Deoxys, Mew, Lugia, Ho-Oh and Sudowoodo stay until you catch them. |
-| Get All Starters | With 8 badges, the last starter waits on Birch's lab table. As Champion with Latias or Latios first in your party, Birch gives you your rival's starter (Lv 5). |
+| Get All Starters | Two steps. **1.** With 8 badges, talk to Birch: the starter neither you nor your rival picked waits on his lab table (your 2nd). **2.** Then, as Champion with Latias or Latios first in your party, Birch gives you a baby of your rival's starter (Lv 5, your 3rd). |
 | Get Other Fossil | **Ruby / Sapphire.** With 8 badges and your fully evolved fossil Pokémon first in the party, the Devon scientist gives you the other one. |
 | Get Other Deep Sea Item | With 8 badges, Captain Stern trades the other Deep Sea item for the Storage Key (but only if you have used it to get the TM). |
 | Roaming Hunter | On the roaming Latias / Latios's route, every encounter is it, and it never flees. |
@@ -335,7 +335,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 |---|---|
 | Get Emerald Game Exclusives | **Ruby / Sapphire.** After the Champion, Emerald's 16 Johto Safari Zone Pokémon spread over the four Safari Zone areas, plus Smeargle and Sudowoodo. |
 | Extras in Safari Zone 5&6 | **Emerald.** Smeargle in area 5, Sudowoodo in area 6. |
-| Get All Johto Starters | Emerald: Birch lets you take all three. Ruby / Sapphire: complete the Hoenn Dex and talk to Birch. |
+| Get All Johto Starters | All three games: complete the Hoenn Dex (up to No. 200) and talk to Birch, then take all three Johto starters instead of one. Emerald uses its own lab table; Ruby / Sapphire borrow Emerald's. |
 
 ---
 
