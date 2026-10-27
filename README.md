@@ -293,7 +293,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 |---|---|
 | Get Other Game Exclusives | Each exclusive pair (Ekans / Sandshrew, Oddish / Bellsprout, Psyduck / Slowpoke, Growlithe / Vulpix, Shellder / Staryu, Scyther / Pinsir and their evolutions) has a 50% chance to be the other game's. Both games get Electabuzz in the Power Plant and Magmar on Mt. Ember. |
 | Trade with Link C. | The Game Boy kid on his own in the Celadon Dept. Store trade-evolves Kadabra, Haunter, Graveler and Machoke with the trade and evolution scenes, then trades them back. |
-| Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, Deoxys and Celebi stay until you catch them. |
+| Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, etc. |
 | Get All Starters | With 8 badges, Oak offers the last Poké Ball. As Champion with Mewtwo first in your party, he gives you your rival's starter (Lv 5). |
 | Get Other Fossil | With 8 badges, Miguel on Mt. Moon B2F trades you the fossil you didn't pick. |
 | Get ??? | The final Pokémon. |
@@ -327,7 +327,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Get All Roaming Beasts | When your game's beast appears, the other two start roaming Kanto too. |
 | Roaming Hunter | On a roaming beast's route, every encounter is it, and it never flees. |
 | Obtain Mystic Ticket | Raikou, Entei and Suicune in slots 1, 2 and 3? Talk to Mom. The Navel Rock ship opens like the real event. |
-| Guardian of the Forest | With Lugia and Ho-Oh caught, Celebi waits in Viridian Forest… Follow it. It leaves the **Aurora Ticket** behind. |
+| Guardian of the Forest | With Lugia and Ho-Oh caught, ??? waits in Viridian Forest and wants to play a game. |
 
 **Ruby / Sapphire / Emerald**
 
