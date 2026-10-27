@@ -1,0 +1,32 @@
+return {
+  summary = "Modern menus and quality-of-life for the five Gen 3 games.",
+  tags = { "ui", "quality-of-life", "cosmetic" },
+  differences = {
+    changed = {
+      "START menu presentation in the normal overworld",
+      "Party menu: A menu order is SUMMARY, ROLE, SWITCH, ITEM, RELEARN, HM moves, TM moves, CANCEL",
+      "Battle: move names framed in their type colour; enemy HP shown in numbers",
+    },
+    added = {
+      "Two-column, five-row Start Menu with icon buttons",
+      "PokéBox: open the PC boxes from the Start Menu",
+      "Themes: Auto, FireRed, LeafGreen, Ruby, Sapphire, Emerald (per game or per save)",
+      "Day, date and clock bar (device clock; rotates with in-game time in Hoenn)",
+      "Sort Menu to arrange the Start Menu items",
+      "PC: Auto-Grab (SELECT) and Multiple selection, including party swaps",
+      "Party: SELECT quick switch and a scroll bar for long A menus",
+      "Bag: 255-item limit with counter; START sort menu; SELECT opens the TM Case (FR/LG)",
+      "Pokédex: SELECT opens Stats / Family / Moves / Location tabs",
+      "QOL: Box Exclusive, Display XP in Party Menu, Open Bag on Specific Pouch and Skip FR/LG Recaps",
+      "QOL: Always Boosted EXP, Decapitalize Words, Infinite Safari, Modern EXP Sharing",
+      "QOL: Rematch Anyone Anytime, Run Everywhere, Sparkling Hidden Items, Unlimited PP, Use Repel Again?",
+      "Custom Borders: themed art around the GBA screen (Automatic, 5 games, 4 custom) and a 16:9 Screen Ratio",
+      "Animated Sprites: Emerald's animated Pokémon sprites in R/S and FR/LG (needs Emerald installed), looping and back animations",
+      "PokéMoves: Forgettable HMs, Instant TMs/HMs, Move Relearning, No Learn HMs, TMs Forever",
+      "Game Corner Cheats: 2X Coins for Cash, Slot Odds (Normal/Generous/Lucky), Bigger Payouts, All Lucky Machines",
+      "Fill Kanto Regional Dex (FR/LG): all starters, other fossil, other game's exclusives, infinite tries for rare PKMN, trade with Link C., ???",
+      "Johto Pokémon Helper: other game's Johto exclusives, all 3 roaming beasts, Mystic Ticket from Mom, Celebi in Viridian Forest (FR/LG); Emerald's Safari Zone Johto Pokémon (R/S), Smeargle/Sudowoodo in Safari Zone 5&6 (E); all 3 Johto starters (R/S/E); trade-evolution items in the department stores after the Champion",
+      "Rumble Settings: the controller (or phone) rumbles when a move hits, stronger on super effective hits",
+    },
+  },
+}

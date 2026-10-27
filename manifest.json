@@ -1,0 +1,23 @@
+{
+  "id": "project_highlander_gen3",
+  "name": "Project Highlander Gen3",
+  "version": "1.70.0",
+  "api": 2,
+  "games": [
+    "gen3"
+  ],
+  "entry": "main.lua",
+  "profile": "content",
+  "game_version": ">=0.3.89 <1.0.0",
+  "category": "UI",
+  "priority": 1200,
+  "dependencies": [],
+  "optional_dependencies": [],
+  "conflicts": [],
+  "incompatible": [],
+  "permissions": [
+    "engine_internals"
+  ],
+  "experimental": false,
+  "description": "Project Highlander Gen3 — a modern 2x5 Start Menu for FireRed, LeafGreen, Ruby, Sapphire and Emerald, with PokéBox, themes, clock and a sortable layout, plus PC, Party, Battle HUD, Game Corner, PokéMoves, Rumble and QOL improvements."
+}

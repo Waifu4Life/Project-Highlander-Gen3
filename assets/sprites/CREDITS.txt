@@ -1,0 +1,5 @@
+jirachi.png: HGSS-style overworld sheet (18 frames of 32x32) taken from Wilds of Hoenn
+(github.com/poooooby/wilds-of-hoenn, assets/atlas/hgss18), used with its author's blessing.
+See Wilds of Hoenn's THIRD_PARTY_NOTICES.md for the art's original credits and licence.
+deoxys.png: HGSS-style overworld sheet (18 frames of 32x32) taken from Wilds of Hoenn
+(assets/atlas/hgss18, 386-normal), used with its author's blessing, like jirachi.png.
