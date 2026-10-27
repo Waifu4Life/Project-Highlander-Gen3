@@ -1,5 +1,9 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.71.0 (BETA)
+- First public BETA on GitHub: github.com/Waifu4Life/Project-Highlander-Gen3
+- manifest.json now points to the GitHub repo, so G1R Deluxe can check for and install updates.
+
 ## 1.70.0
 - New sub-menu: JOHTO POKéMON HELPER (all five games, every option On, each game only shows its own
   rows). Still no National Dex in a single game: it helps the players who fill it by trading.
