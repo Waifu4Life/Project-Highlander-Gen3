@@ -352,6 +352,5 @@ This is a **BETA**, so feedback helps a lot. When reporting a bug, please includ
 
 ## Credits
 
-- **Ish** — Modern UI Suite, which Project Highlander started from
 - **poooooby** — Wilds of Hoenn; Jirachi and Deoxys HGSS overworld sprites used with permission (see Wilds of Hoenn's THIRD_PARTY_NOTICES.md for the art's original credits)
 - **Waifu4Life** — Project Highlander Gen3: menus, QoL, Regional Dex tools, Johto Pokémon Helper, rumble, integration
