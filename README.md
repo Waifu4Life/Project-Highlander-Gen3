@@ -60,8 +60,6 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Screen Ratio | 16:9 |
 | Ball Shortcuts | Up: Poké Ball, Down: Ultra Ball, Left: Great Ball, Right: None |
 
-Changing a default never overwrites a setting you have already picked.
-
 Rows that don't concern the game you're playing are hidden (FireRed / LeafGreen-only rows don't show in Hoenn, Ruby / Sapphire-only rows don't show in Emerald, and so on).
 
 ---
