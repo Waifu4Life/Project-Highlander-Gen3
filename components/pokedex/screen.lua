@@ -328,6 +328,27 @@ return function(ctx, D)
     end
   end
 
+  -- Text wider than its room scrolls: it waits, slides left until its end
+  -- shows, waits, then starts over. Clipped to its room (the clip is set in
+  -- the render target's pixels, so it goes through the current transform).
+  local SCROLL_SPEED, SCROLL_PAUSE = 20, 1.2
+  local function scrollText(t, x, y, o, roomW)
+    local w = width(t, o)
+    if w <= roomW then text(t, x, y, o) return end
+    local over = w - roomW
+    local cycle = SCROLL_PAUSE * 2 + over / SCROLL_SPEED
+    local clock = ((love.timer and love.timer.getTime()) or 0) % cycle
+    local off = math.max(0, math.min(over, (clock - SCROLL_PAUSE) * SCROLL_SPEED))
+    local okT, x1, y1 = pcall(love.graphics.transformPoint, x, y - 6)
+    local okU, x2, y2 = pcall(love.graphics.transformPoint, x + roomW, y + 18)
+    if not (okT and okU and love.graphics.intersectScissor) then text(t, x, y, o) return end
+    love.graphics.push("all")
+    pcall(love.graphics.intersectScissor, math.floor(x1), math.floor(y1),
+      math.max(1, math.ceil(x2 - x1)), math.max(1, math.ceil(y2 - y1)))
+    text(t, x - math.floor(off), y, o)
+    love.graphics.pop()
+  end
+
   local function drawFamily(pal)
     local fam = familyData()
     if not fam or #fam.flat <= 1 then
@@ -355,7 +376,8 @@ return function(ctx, D)
         if not compact then icon(m.species, cx + 2, cy - 2, known) end
         text(name, nameX, cy + (compact and -2 or 1), opts(nil, nil, true, colW - (nameX - cx) - 2))
         if m.method then
-          text(m.method, nameX, cy + (compact and 6 or 11), opts(pal.main, nil, true, colW - (nameX - cx) - 2))
+          local room = colW - (nameX - cx) - 4
+          scrollText(m.method, nameX, cy + (compact and 6 or 11), opts(pal.main, nil, true, 400), room)
         end
       end
       if s > 1 then
@@ -428,6 +450,27 @@ return function(ctx, D)
     end
     local small = opts(nil, nil, true, 84)
     local PILL_X, PILL_W = PX + 102, 54
+    local LV_X, RATE_R = PILL_X + PILL_W + 6, PX + PW - 10
+    local function rateOf(r)
+      local rate = tonumber(r.rate) or 0
+      return (rate % 1 == 0) and ("%d%%"):format(rate) or ("%.1f%%"):format(rate)
+    end
+    local function levelsOf(r, prefix)
+      local lv = r.lo == r.hi and ("%d"):format(r.lo) or ("%d-%d"):format(r.lo, r.hi)
+      return prefix and ("LV " .. lv) or lv
+    end
+    -- Two-digit level ranges next to a decimal rate (LV 40-61  7.5%) don't
+    -- fit: then the whole list drops "LV " so the column stays even.
+    local lvPrefix = true
+    for _, r in ipairs(rows) do
+      if not r.header and r.lo then
+        local rt = rateOf(r)
+        if LV_X + width(levelsOf(r, true), small) + 4 > RATE_R - width(rt, small) then
+          lvPrefix = false
+          break
+        end
+      end
+    end
     for vi = 1, LIST_ROWS do
       local i = M.scroll + vi
       local r = rows[i]
@@ -440,11 +483,8 @@ return function(ctx, D)
       love.graphics.rectangle("fill", PILL_X, ry + 1, PILL_W, 11, 3, 3)
       local pillText = opts({ 1, 1, 1, 1 }, { 0, 0, 0, 0.30 }, true, PILL_W)
       text(k[1], PILL_X + math.floor((PILL_W - width(k[1], pillText)) / 2), ry - 2, pillText)
-      local lv = r.lo == r.hi and ("LV %d"):format(r.lo) or ("LV %d-%d"):format(r.lo, r.hi)
-      text(lv, PILL_X + PILL_W + 6, ry - 2, small)
-      local rate = tonumber(r.rate) or 0
-      local rateText = (rate % 1 == 0) and ("%d%%"):format(rate) or ("%.1f%%"):format(rate)
-      right(rateText, PX + PW - 10, ry - 2, small)
+      text(levelsOf(r, lvPrefix), LV_X, ry - 2, small)
+      right(rateOf(r), RATE_R, ry - 2, small)
     end
     scrollMarks(#rows, M.scroll, LIST_ROWS, pal)
   end

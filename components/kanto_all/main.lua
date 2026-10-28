@@ -23,7 +23,12 @@
 --                           like Gen 1. Only a catch makes them go away.
 --   TRADE WITH LINK C.      the GBA kid in the Celadon Department Store
 --                           trade-evolves your KADABRA, HAUNTER, GRAVELER and
---                           MACHOKE (once each) and gives them back.
+--                           MACHOKE, plus the held-item trades (POLIWHIRL /
+--                           SLOWPOKE + KING'S ROCK, ONIX / SCYTHER + METAL COAT,
+--                           SEADRA + DRAGON SCALE, PORYGON + UP-GRADE, CLAMPERL
+--                           + DEEPSEATOOTH / DEEPSEASCALE), once each, and
+--                           gives them back. Non-Kanto results need the
+--                           NATIONAL POKéDEX, like a real FireRed/LeafGreen trade.
 --   GET ???                 Champion and all 150 other Kanto Pokémon caught:
 --                           Mom has seen a strange little Pokémon in the
 --                           house...
@@ -479,12 +484,52 @@ return function(ctx)
 
   -- ------------------------------------------------------------- TRADE WITH LINK C.
 
+  -- item ids: King's Rock 187, DeepSeaTooth 192, DeepSeaScale 193,
+  -- Metal Coat 199, Dragon Scale 201, Up-Grade 218 (same as johto/shops.lua).
+  -- Species are National Dex numbers (Clamperl's game id isn't 366).
   local TRADE = {
-    { from = SP.KADABRA, key = "kgk_linkc_kadabra" },
-    { from = SP.HAUNTER, key = "kgk_linkc_haunter" },
-    { from = SP.GRAVELER, key = "kgk_linkc_graveler" },
-    { from = SP.MACHOKE, key = "kgk_linkc_machoke" },
+    { nat = 64, key = "kgk_linkc_kadabra" },
+    { nat = 93, key = "kgk_linkc_haunter" },
+    { nat = 75, key = "kgk_linkc_graveler" },
+    { nat = 67, key = "kgk_linkc_machoke" },
+    { nat = 61, item = 187, key = "kgk_linkc_politoed" },  -- Poliwhirl + King's Rock
+    { nat = 79, item = 187, key = "kgk_linkc_slowking" },  -- Slowpoke + King's Rock
+    { nat = 95, item = 199, key = "kgk_linkc_steelix" },   -- Onix + Metal Coat
+    { nat = 123, item = 199, key = "kgk_linkc_scizor" },   -- Scyther + Metal Coat
+    { nat = 117, item = 201, key = "kgk_linkc_kingdra" },  -- Seadra + Dragon Scale
+    { nat = 137, item = 218, key = "kgk_linkc_porygon2" }, -- Porygon + Up-Grade
+    { nat = 366, item = 192, key = "kgk_linkc_huntail" },  -- Clamperl + DeepSeaTooth
+    { nat = 366, item = 193, key = "kgk_linkc_gorebyss" }, -- Clamperl + DeepSeaScale
   }
+  local tradeSpCache = {}
+  local function tradeSpecies(nat)
+    if tradeSpCache[nat] then return tradeSpCache[nat] end
+    local id = nat
+    local Pokemon = req("src.core.game3.pokemon")
+    if Pokemon and Pokemon.speciesFromNational then
+      local ok, v = pcall(Pokemon.speciesFromNational, nat)
+      if ok and tonumber(v) then id = tonumber(v) end
+    end
+    tradeSpCache[nat] = id
+    return id
+  end
+  local function heldItem(mon)
+    return tonumber(mon and (mon.heldItem or mon.item)) or 0
+  end
+  local function tradeRow(mon)
+    if not mon or isEgg(mon) then return nil end
+    local sp = speciesOf(mon)
+    for _, t in ipairs(TRADE) do
+      if tradeSpecies(t.nat) == sp and not sget(t.key) and (not t.item or heldItem(mon) == t.item) then
+        return t
+      end
+    end
+  end
+
+  local ONLY = "I only trade KADABRA, HAUNTER, GRAVELER or MACHOKE.\f"
+    .. "Or POLIWHIRL or SLOWPOKE holding a KING'S ROCK, ONIX or SCYTHER holding a METAL COAT, "
+    .. "SEADRA holding a DRAGON SCALE, PORYGON holding an UP-GRADE,\f"
+    .. "or CLAMPERL holding a DEEPSEATOOTH or a DEEPSEASCALE."
 
   -- the Game Boy (GBA) kid that's on his own in the Celadon Department Store
   local function isLinkC(eo)
@@ -592,22 +637,39 @@ return function(ctx)
     return copy
   end
 
+  -- Link C.'s own Pokémon evolves on his side too (it was traded), so the
+  -- trade back shows it evolved. Only the trade scene ever sees this copy.
+  local function evolveCopy(copy, target)
+    if not (copy and tonumber(target)) then return end
+    copy.species = tonumber(target)
+    if copy.speciesId ~= nil then copy.speciesId = tonumber(target) end
+    copy.name = nil
+  end
+
   local function tradeEvolve(slot)
     local sess = session()
     local mon = sess and sess.party and sess.party[slot]
-    local sp = speciesOf(mon)
-    local row
-    for _, t in ipairs(TRADE) do if t.from == sp and not sget(t.key) then row = t end end
-    if not row or isEgg(mon) then
-      say("I only trade KADABRA, HAUNTER, GRAVELER or MACHOKE.")
+    local row = tradeRow(mon)
+    if not row then say(ONLY) return end
+    local Evolution = req("src.core.game3.evolution")
+    -- tradeTarget also uses up the held item, like a real trade. Before the
+    -- NATIONAL POKéDEX, FireRed/LeafGreen won't evolve into a non-Kanto
+    -- Pokémon (Politoed, Steelix...): tradeTarget says no and keeps the item.
+    local target = Evolution and Evolution.tradeTarget and Evolution.tradeTarget(mon, sess)
+    if not target then
+      if row.item then
+        say("Hmm... it won't evolve. Your POKéDEX can't record what it would become yet.\f"
+          .. "Come back once you have the NATIONAL POKéDEX!")
+      else
+        say(ONLY)
+      end
       return
     end
-    local Evolution = req("src.core.game3.evolution")
-    local target = Evolution and Evolution.tradeTarget and Evolution.tradeTarget(mon, sess)
     local his = linkCopy(mon)
     say("Okay, connect the cable like so!", function()
       -- your Pokémon goes to Link C. and evolves there...
       runSteps({ fadeStep(true), tradeStep(mon, his), evolveStep(mon, target, sess) }, function()
+        evolveCopy(his, speciesOf(mon) or target)
         say("OK, now let's trade back.", function()
           -- ...then comes back to you, evolved
           runSteps({ fadeStep(true), tradeStep(his, mon) }, function()

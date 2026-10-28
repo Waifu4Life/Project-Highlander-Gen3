@@ -35,6 +35,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 - [Rumble Settings](#rumble-settings)
 - [PokéMoves](#pokémoves)
 - [Full Control](#full-control)
+- [Jukebox](#jukebox)
 - [Shortcuts Settings](#shortcuts-settings)
 - [Custom Borders](#custom-borders)
 - [Game Corner Cheats](#game-corner-cheats)
@@ -59,6 +60,7 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Slot Odds | Normal |
 | Screen Ratio | 16:9 |
 | Ball Shortcuts | Up: Poké Ball, Down: Ultra Ball, Left: Great Ball, Right: None |
+| Jukebox Button | None (set it in Full Control) |
 
 Rows that don't concern the game you're playing are hidden (FireRed / LeafGreen-only rows don't show in Hoenn, Ruby / Sapphire-only rows don't show in Emerald, and so on).
 
@@ -111,6 +113,7 @@ These run whenever the matching screen or event is in play. There is no toggle.
 | Full Control | Button rebinding. |
 | Game Corner Cheats | Stack the odds in your favor. |
 | Johto Pokémon Helper | Helps fill the National Dex by trading between games. |
+| Jukebox | Pick the songs you like and play them instead of the area music. |
 | Other System Settings | Everything else. |
 | Overworld Screen | Travel and exploration options. |
 | PokéMoves | HM / TM / relearn tools. |
@@ -248,9 +251,35 @@ Hits follow effectiveness: not very effective = a light tap, effective = one sol
 ## Full Control
 
 - Rebind Up, Down, Left, Right, A, B, Start, Select, **L, R**, Speed+ and Speed− (one key and one pad control each). Delete clears a binding.
+- **Jukebox Button:** the button that controls the [Jukebox](#jukebox). No key or pad by default.
 - Left Analog for D-Pad and Right Analog for D-Pad.
 - **Select Visual Combos:** turn it off to use Select + pad buttons normally instead of the display shortcuts.
 - The stock Controls page is hidden while Full Control is on.
+
+## Jukebox
+
+**All five games.** Tired of the Safari Zone music? Play the songs you like instead.
+
+The sub-menu lists every background song of the game you're playing, A–Z, each **On** by default. Each game keeps its own list. The songs that are On make the playlist, in the menu's order. Short jingles (item, badge, heal, level up…) aren't listed.
+
+| Option | What it does |
+|---|---|
+| All Songs | Shows On / Off / Some. One press turns every song Off, or every song On when none is. |
+| *Each song* | On / Off: in the playlist or not. |
+
+Set a **Jukebox Button** in [Full Control](#full-control), then in the overworld hold it and press a direction. The button alone does nothing, and while it's held you stay put.
+
+| Combo | What it does |
+|---|---|
+| Button + Up | Play the playlist, from the song it was on last. Already playing: shows the song's name. |
+| Button + Down | Stop it and go back to the game's own music. |
+| Button + Left | Previous song (from the first, goes round to the last). Only while playing. |
+| Button + Right | Next song (from the last, goes round to the first). Only while playing. |
+
+- The Jukebox song stays on through new maps, Surf, Bicycle and Dive.
+- Battles, trainer encounters, evolutions, scripted events and jingles keep the game's music; your song comes back after them.
+- A short note at the top left shows the song's name, in your Start Menu theme's colours.
+- Needs **Full Control → Enable** On. In menus, battles and the naming screen the button does what it did before.
 
 ## Shortcuts Settings
 

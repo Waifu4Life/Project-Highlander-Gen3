@@ -129,6 +129,18 @@ return function(mod)
     if g and type(g.writeOptions) == "function" then pcall(g.writeOptions, g) end
   end
 
+  -- many keys at once, written to the options file once (JUKEBOX > ALL SONGS)
+  function S.setMany(values)
+    local g = liveGame()
+    local saved = g and bucket(g.options, true)
+    local live = g and bucket(g.mods, true)
+    for key, value in pairs(values) do
+      if saved then saved[key] = value end
+      if live then live[key] = value end
+    end
+    if g and type(g.writeOptions) == "function" then pcall(g.writeOptions, g) end
+  end
+
   function S.flag(key)
     return S.get(key) ~= false
   end

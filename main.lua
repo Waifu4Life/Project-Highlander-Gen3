@@ -37,6 +37,7 @@ return function(mod)
   ctx.hoennAll = loadLocal("components/hoenn_all/main.lua")(ctx)
   ctx.johto = loadLocal("components/johto/main.lua")(ctx)
   ctx.animSprites = loadLocal("components/animated_sprites/main.lua")(ctx)
+  ctx.jukebox = loadLocal("components/jukebox/main.lua")(ctx)
   ctx.hub = loadLocal("core/options_hub.lua")(ctx)
   ctx.buttonMode = loadLocal("core/button_mode.lua")(mod)
 
@@ -76,6 +77,8 @@ return function(mod)
     if not okGc and mod.log then mod.log:warn("game corner: %s", tostring(errGc)) end
     local okRu, errRu = pcall(ctx.rumble.install)
     if not okRu and mod.log then mod.log:warn("rumble: %s", tostring(errRu)) end
+    local okJb, errJb = pcall(ctx.jukebox.install)
+    if not okJb and mod.log then mod.log:warn("jukebox: %s", tostring(errJb)) end
     local okFc, errFc = pcall(ctx.fullControl.install)
     if not okFc and mod.log then mod.log:warn("full control: %s", tostring(errFc)) end
     ctx.hub.install()

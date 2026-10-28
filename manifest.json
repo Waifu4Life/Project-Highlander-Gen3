@@ -1,7 +1,7 @@
 {
   "id": "project_highlander_gen3",
   "name": "Project Highlander Gen3",
-  "version": "1.71.0",
+  "version": "1.76.0",
   "api": 2,
   "games": [
     "gen3"

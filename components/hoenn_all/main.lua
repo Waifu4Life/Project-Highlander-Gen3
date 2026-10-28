@@ -35,8 +35,10 @@
 --   ROAMING HUNTER          on the roaming Latias/Latios's route, every encounter
 --                           is it, and it never flees.
 --   TRADE WITH LINK C.      the GameCube in your room trade-evolves KADABRA,
---                           GRAVELER, MACHOKE, SEADRA (Dragon Scale) and CLAMPERL
---                           (Deep Sea Tooth / Deep Sea Scale), once each.
+--                           HAUNTER, GRAVELER, MACHOKE, POLIWHIRL / SLOWPOKE (King's
+--                           Rock), ONIX / SCYTHER (Metal Coat), SEADRA (Dragon
+--                           Scale), PORYGON (Up-Grade) and CLAMPERL (Deep Sea
+--                           Tooth / Deep Sea Scale), once each.
 --
 -- Progress is kept in the save file (mod.save).
 return function(ctx)
@@ -101,6 +103,7 @@ return function(ctx)
   -- National Dex numbers -> the game's own species ids
   local NAT = {
     KADABRA = 64, MACHOKE = 67, GRAVELER = 75, SEADRA = 117, MEW = 151,
+    POLIWHIRL = 61, SLOWPOKE = 79, HAUNTER = 93, ONIX = 95, SCYTHER = 123, PORYGON = 137,
     SUDOWOODO = 185, LUGIA = 249, HO_OH = 250,
     TREECKO = 252, SCEPTILE = 254, TORCHIC = 255, BLAZIKEN = 257, MUDKIP = 258, SWAMPERT = 260,
     LOTAD = 270, LOMBRE = 271, SEEDOT = 273, NUZLEAF = 274, SURSKIT = 283,
@@ -804,9 +807,15 @@ return function(ctx)
   -- keyed by what it evolves into (Clamperl has two)
   local TRADE = {
     { from = "KADABRA", into = 65, key = "hgk_linkc_kadabra" },
+    { from = "HAUNTER", into = 94, key = "hgk_linkc_haunter" },
     { from = "GRAVELER", into = 76, key = "hgk_linkc_graveler" },
     { from = "MACHOKE", into = 68, key = "hgk_linkc_machoke" },
+    { from = "POLIWHIRL", into = 186, key = "hgk_linkc_politoed", item = "ITEM_KINGS_ROCK" },
+    { from = "SLOWPOKE", into = 199, key = "hgk_linkc_slowking", item = "ITEM_KINGS_ROCK" },
+    { from = "ONIX", into = 208, key = "hgk_linkc_steelix", item = "ITEM_METAL_COAT" },
+    { from = "SCYTHER", into = 212, key = "hgk_linkc_scizor", item = "ITEM_METAL_COAT" },
     { from = "SEADRA", into = 230, key = "hgk_linkc_seadra", item = "ITEM_DRAGON_SCALE" },
+    { from = "PORYGON", into = 233, key = "hgk_linkc_porygon2", item = "ITEM_UP_GRADE" },
     { from = "CLAMPERL", into = 367, key = "hgk_linkc_clamperl_tooth", item = "ITEM_DEEP_SEA_TOOTH" },
     { from = "CLAMPERL", into = 368, key = "hgk_linkc_clamperl_scale", item = "ITEM_DEEP_SEA_SCALE" },
   }
@@ -873,7 +882,18 @@ return function(ctx)
     return copy
   end
 
-  local ONLY = "I only trade KADABRA, GRAVELER, MACHOKE, SEADRA holding a DRAGON SCALE, "
+  -- Link C.'s own Pokémon evolves on his side too (it was traded), so the
+  -- trade back shows it evolved. Only the trade scene ever sees this copy.
+  local function evolveCopy(copy, target)
+    if not (copy and tonumber(target)) then return end
+    copy.species = tonumber(target)
+    if copy.speciesId ~= nil then copy.speciesId = tonumber(target) end
+    copy.name = nil
+  end
+
+  local ONLY = "I only trade KADABRA, HAUNTER, GRAVELER or MACHOKE.\f"
+    .. "Or POLIWHIRL or SLOWPOKE holding a KING'S ROCK, ONIX or SCYTHER holding a METAL COAT, "
+    .. "SEADRA holding a DRAGON SCALE, PORYGON holding an UP-GRADE,\f"
     .. "or CLAMPERL holding a DEEPSEATOOTH or a DEEPSEASCALE."
 
   local function tradeEvolve(slot)
@@ -888,6 +908,7 @@ return function(ctx)
     local his = linkCopy(mon)
     say("Okay, connect the cable like so!", function()
       runSteps({ fadeStep(true), tradeStep(mon, his), evolveStep(mon, target, sess) }, function()
+        evolveCopy(his, speciesOf(mon) or target)
         say("OK, now let's trade back.", function()
           runSteps({ fadeStep(true), tradeStep(his, mon) }, function()
             sset(row.key, true)

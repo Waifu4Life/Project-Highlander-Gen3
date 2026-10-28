@@ -280,6 +280,21 @@ return function(ctx)
     local okK, Pokedex = pcall(require, "src.ui.game3.pokedex")
     if okK and type(Pokedex) == "table" then
       hook(Pokedex, "pokedex")
+      -- FireRed/LeafGreen Table of Contents: the SEEN / OWNED numbers start
+      -- right where "National" ends (worse with Decapitalize Words): moved a
+      -- few pixels right, still inside the page.
+      if not FrlgFont._ph3TocShift then
+        FrlgFont._ph3TocShift = true
+        local origDraw = FrlgFont.draw
+        FrlgFont.draw = function(t, x, y, o, ...)
+          if x == 212 and Pokedex.open and Pokedex.screen == "mode_select"
+              and type(t) == "string" and t:find("^%s*%d+$")
+              and not (type(o) == "table" and o.small) then
+            x = x + 5
+          end
+          return origDraw(t, x, y, o, ...)
+        end
+      end
       local okC, Chrome = pcall(require, "src.ui.game3.pokedex_chrome")
       if okC and type(Chrome) == "table" and type(Chrome.drawControlInfoLeft) == "function" then
         local pendingX, pendingY = nil, nil

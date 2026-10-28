@@ -1,5 +1,62 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.76.0
+- JUKEBOX: BUTTON + LEFT / RIGHT do nothing while the playlist isn't playing (they used to start
+  it). Only BUTTON + UP starts it.
+
+## 1.75.0
+- JUKEBOX: new controls. FULL CONTROL > JUKEBOX BUTTON is now held with a direction (the button
+  alone does nothing; while it's held you stay put and the directions only work the Jukebox):
+  - + UP: play the playlist, from the song it was on last (already playing: shows its name).
+  - + DOWN: stop it and go back to the game's own music.
+  - + LEFT: previous song (from the first, goes round to the last).
+  - + RIGHT: next song (from the last, goes round to the first).
+  - LEFT / RIGHT also start the playlist when it isn't playing.
+- JUKEBOX BUTTON has no key or pad by default (NONE): set one in FULL CONTROL.
+- Pokédex 2nd screen, FAMILY tab: an evolution method too long for its card (e.g. "Trade w/
+  King's Rock") now scrolls: it waits, slides until its end shows, waits, and starts over.
+  Methods that fit don't move.
+
+## 1.74.0
+- New sub-menu: JUKEBOX (all five games). ALL SONGS on top (ON / OFF / SOME: one press turns
+  them all Off, or all On when none is), then every background song of the game you're playing,
+  A-Z, each On by default. Each game keeps its own list. The songs that are On are the playlist,
+  in the menu's order. Jingles (item, badge, heal, level up...) aren't listed.
+- FULL CONTROL: new JUKEBOX BUTTON (default J / pad Y), works in the overworld only:
+  - Press: the area music becomes the next song of the playlist (the first one on the first
+    press). Pressing on the last song goes back to the game's own music.
+  - Hold: back to the game's own music at once.
+  - The Jukebox song stays on through new maps, Surf, Bicycle and Dive. Battles, trainer
+    encounters, evolutions, scripted events and jingles keep the game's music, and the Jukebox
+    song comes back after them.
+  - A short note at the top left shows the song's name (in the Start Menu theme's colours).
+  - Like SPEED+ / SPEED-, it needs FULL CONTROL > ENABLE On. In menus, battles and the naming
+    screen the key does what it did before.
+
+## 1.73.0
+- TRADE WITH LINK C. (all five games): on the trade back, Link C.'s own Pokémon now shows evolved
+  too (it was traded to you, so it evolved on your side as well), for regular and held-item trades.
+  Purely what the trade scene shows; nothing else changes.
+- FILL HOENN REGIONAL DEX > TRADE WITH LINK C. (Ruby/Sapphire/Emerald) now covers every Gen 3 trade
+  evolution, like FireRed/LeafGreen: added HAUNTER, POLIWHIRL or SLOWPOKE holding a KING'S ROCK,
+  ONIX or SCYTHER holding a METAL COAT and PORYGON holding an UP-GRADE (Pokémon traded in from
+  another game; the items are sold at Lilycove after the Champion). Hoenn has no National Dex
+  rule for evolving, so these work right away.
+
+## 1.72.0
+- Fixed: Pokédex 2nd screen, LOCATION tab. A two-digit level range next to a decimal rate
+  (Slowbro's "LV 40-61 7.5%") printed over itself. When a Pokémon has a row that doesn't fit, its
+  whole list drops "LV " (40-61 7.5%) so the levels stay in one even column; lists that fit
+  (Horsea) are unchanged.
+- FireRed/LeafGreen Pokédex Table of Contents: the SEEN / OWNED numbers moved 5 px right, so they
+  no longer touch "National" (more visible with DECAPITALIZE WORDS).
+- FILL KANTO REGIONAL DEX > TRADE WITH LINK C. now also does the held-item trade evolutions, like
+  the Hoenn GameCube one: POLIWHIRL or SLOWPOKE holding a KING'S ROCK, ONIX or SCYTHER holding a
+  METAL COAT, SEADRA holding a DRAGON SCALE, PORYGON holding an UP-GRADE, and CLAMPERL holding a
+  DEEPSEATOOTH or DEEPSEASCALE (once each; the item is used up, like a real trade). As in a real
+  FireRed/LeafGreen trade, these need the NATIONAL POKéDEX: before it, Link C. says so and keeps
+  nothing.
+
 ## 1.71.0 (BETA)
 - First public BETA on GitHub: github.com/Waifu4Life/Project-Highlander-Gen3
 - manifest.json now points to the GitHub repo, so G1R Deluxe can check for and install updates.

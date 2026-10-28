@@ -356,6 +356,33 @@ return function(ctx)
     }
   end
 
+  -- ALL SONGS on top (ON / OFF / SOME: A or LEFT/RIGHT turns them all On,
+  -- or all Off when any is On), then this game's songs A-Z: the playlist.
+  local function jukeboxRows()
+    local JB = ctx.jukebox
+    local rows = {
+      {
+        id = "ph3_jb_all", label = "ALL SONGS",
+        value = aligned(function() return JB.allLabel() end),
+        step = function()
+          JB.toggleAll()
+          return true
+        end,
+      },
+    }
+    for _, song in ipairs(JB.list()) do
+      rows[#rows + 1] = {
+        id = "ph3_jb_" .. song.name, label = song.label,
+        value = aligned(function() return onOff(JB.isOn(song.name)) end),
+        step = function()
+          JB.toggle(song.name)
+          return true
+        end,
+      }
+    end
+    return rows
+  end
+
   local function hubRows(openPage)
     local function page(id, label, build)
       return {
@@ -375,6 +402,7 @@ return function(ctx)
       page("full_control", "FULL CONTROL", fullControlRows),
       page("game_corner", "GAME CORNER CHEATS", gameCornerRows),
       page("johto_helper", "JOHTO POKéMON HELPER", johtoRows),
+      page("jukebox", "JUKEBOX", jukeboxRows),
       page("other_system", "OTHER SYSTEM SETTINGS", otherSystemRows),
       page("overworld_screen", "OVERWORLD SCREEN", overworldScreenRows),
       page("pokemoves", "POKéMOVES", pokemovesRows),

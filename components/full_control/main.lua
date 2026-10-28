@@ -4,7 +4,8 @@
 -- completely (keyboard, gamepad and raw joystick) and the stock
 -- OPTIONS > CONTROLS page is hidden. Each button has one key and one pad
 -- control; A on a row waits for a key or pad press (DELETE clears the row).
--- LEFT / RIGHT ANALOG FOR D-PAD make a stick walk. SELECT VISUAL COMBOS
+-- LEFT / RIGHT ANALOG FOR D-PAD make a stick walk. JUKEBOX BUTTON plays the
+-- Jukebox playlist in the overworld (components/jukebox). SELECT VISUAL COMBOS
 -- (On) keeps the game's SELECT + face/shoulder display shortcuts; Off lets
 -- those buttons act normally while SELECT is held.
 return function(ctx)
@@ -31,7 +32,12 @@ return function(ctx)
     { id = "r", action = "r", label = "R BUTTON", key = "e", pad = "rightshoulder" },
     { id = "speedp", action = "speedUp", label = "SPEED+ BUTTON", key = "1", pad = "triggerright", speed = 1 },
     { id = "speedm", action = "speedDown", label = "SPEED- BUTTON", key = "0", pad = "triggerleft", speed = -1 },
+    -- JUKEBOX (components/jukebox): held + a direction; no key or pad by default
+    { id = "jukebox", action = "jukebox", label = "JUKEBOX BUTTON", key = "", pad = "", jukebox = true },
   }
+  local function jukeboxRow()
+    for _, row in ipairs(F.ROWS) do if row.jukebox then return row end end
+  end
 
   function F.enabled() return S.get("fullctl_enabled") ~= false end
   local function analogLeft() return S.get("fullctl_analog_left") ~= false end
@@ -109,7 +115,9 @@ return function(ctx)
     for _, row in ipairs(F.ROWS) do
       local k, p = bindOf(row)
       local jn = p ~= "" and tonumber(p:match("^joy(%d+)$")) or nil
-      if row.speed then
+      if row.jukebox then
+        -- handled below (press / release), never sent to the game
+      elseif row.speed then
         if jn then joyActs[jn] = row.action
         elseif p ~= "" then
           local b = norm(p)
@@ -260,9 +268,70 @@ return function(ctx)
       return r
     end
 
+    -- JUKEBOX BUTTON: its key / pad / joystick button goes to the Jukebox
+    -- (not while a bind is being captured, nor with SELECT held on a pad)
+    local function normPad(b)
+      local GM = req("src.core.GamepadMap")
+      if GM and GM.normalizePad then return GM.normalizePad(b) or b end
+      return b
+    end
+    -- presses only in the free overworld (menus, battles, the naming screen
+    -- keep the key); its release goes wherever its press went
+    local function jukeboxOwns(self, kind, value, release)
+      local J = ctx.jukebox
+      if not (F.enabled() and J) then return false end
+      if release then
+        if not (J.isHeld and J.isHeld(kind, kind == "pad" and normPad(value) or value)) then return false end
+      elseif not (J.canUse and J.canUse()) then
+        return false
+      end
+      local input = self and self.input
+      if input and input.captureArmed then return false end
+      local row = jukeboxRow()
+      if not row then return false end
+      local k, p = bindOf(row)
+      if kind == "key" then return k ~= "" and k == value end
+      if kind == "joy" then return p ~= "" and p == ("joy" .. tostring(value)) end
+      if p == "" or p:find("^joy") then return false end
+      if input and input.isDown and input:isDown("select") then return false end
+      return normPad(p) == normPad(value)
+    end
+    local function jukeboxEvent(pressed, kind, value)
+      local J = ctx.jukebox
+      local fn = J and (pressed and J.press or J.release)
+      if fn then pcall(fn, kind, value) end
+    end
+
+    local origKeyUp = Game3.keyreleased
+    Game3.keyreleased = function(self, key, ...)
+      if jukeboxOwns(self, "key", key, true) then jukeboxEvent(false, "key", key) return end
+      return origKeyUp(self, key, ...)
+    end
+    local origPadUp = Game3._padReleasedBody
+    if type(origPadUp) == "function" then
+      Game3._padReleasedBody = function(self, joystick, button, ...)
+        if jukeboxOwns(self, "pad", button, true) then jukeboxEvent(false, "pad", normPad(button)) return end
+        return origPadUp(self, joystick, button, ...)
+      end
+    end
+    local origJoyDown, origJoyUp = Game3.joystickpressed, Game3.joystickreleased
+    if type(origJoyDown) == "function" then
+      Game3.joystickpressed = function(self, joystick, button, ...)
+        if jukeboxOwns(self, "joy", button) then jukeboxEvent(true, "joy", button) return end
+        return origJoyDown(self, joystick, button, ...)
+      end
+    end
+    if type(origJoyUp) == "function" then
+      Game3.joystickreleased = function(self, joystick, button, ...)
+        if jukeboxOwns(self, "joy", button, true) then jukeboxEvent(false, "joy", button) return end
+        return origJoyUp(self, joystick, button, ...)
+      end
+    end
+
     -- SELECT VISUAL COMBOS Off: SELECT + a pad button never runs a display hotkey
     local origPad = Game3._padPressedBody
     Game3._padPressedBody = function(self, joystick, button, ...)
+      if jukeboxOwns(self, "pad", button) then jukeboxEvent(true, "pad", normPad(button)) return end
       if not (F.enabled() and not combos()) then return origPad(self, joystick, button, ...) end
       local GM = require("src.core.GamepadMap")
       local digit = GM.displayChordDigit
@@ -276,6 +345,7 @@ return function(ctx)
     local origKey = Game3.keypressed
     Game3.keypressed = function(self, key, ...)
       local input = self and self.input
+      if jukeboxOwns(self, "key", key) then jukeboxEvent(true, "key", key) return end
       if F.enabled() and not (input and input.captureArmed) then
         for _, row in ipairs(F.ROWS) do
           if row.speed then
