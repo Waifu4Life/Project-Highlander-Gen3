@@ -1,5 +1,33 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.78.0
+- START MENU / SORT MENU / CUSTOM ICONS: the small text at the top right (page number, button
+  hints) sits higher, lined up with the clock / title on the left instead of touching the bar's
+  bottom edge.
+- SORT MENU: the items other mods add to the Start Menu are in it too, and move like the others
+  (before, they always stayed after the built-in items, right before EXIT). With more than nine
+  items the Sort Menu has pages like the Start Menu; EXIT stays bottom-right of the last page.
+  Items it hasn't seen sorted yet go at the end; SELECT (Reset) puts the built-in items back in
+  their default order with other mods' items after them.
+
+## 1.77.0
+- START MENU: more than nine items besides EXIT (e.g. other mods' entries) no longer drop you
+  back to the game's own Start Menu. The grid gets a 2nd page (or more), like Project Highlander
+  Gen1+2: EXIT is always the bottom-right tile of the last page, UP / DOWN go from page to page
+  (and wrap round), LEFT / RIGHT switch column on the same page, and the top bar shows the page
+  (e.g. 1/2) at the right.
+- START MENU SETTINGS: new CUSTOM ICONS. Lists the items other mods add to the Start Menu (in
+  tiles like the Start Menu's, with pages); A opens a picker of 32 coloured icons (the Start
+  Menu's own plus 22 new ones: Menu, Link, Quest, Map, Music, Camera, Trophy, Heart, Star, Tools,
+  Key, Clock, Mail, Chat, Home, Shop, Chest, Battle, Potion, Bike, Craft, Search). A sets it,
+  B goes back; SELECT on an item puts it back to AUTO. A dot marks the icon in use.
+  - AUTO (default) picks an icon from the item's name (e.g. JUKEBOX / MUSIC -> Music, MAP -> Map),
+    else the MODS icon as before.
+  - Shared by all five games. Items are remembered once seen in the Start Menu, so they stay
+    listed even when they're not in the menu right now.
+  - New asset: assets/start_menu/custom_icons.png (coloured from Project Highlander Gen1+2's
+    16x16 icon strip, NikoIchu's CC0 Pixel Icons).
+
 ## 1.76.0
 - JUKEBOX: BUTTON + LEFT / RIGHT do nothing while the playlist isn't playing (they used to start
   it). Only BUTTON + UP starts it.

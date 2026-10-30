@@ -23,10 +23,11 @@ return function(ctx)
   -- ------- icons (built once from the 14x14 maps)
 
   local icons = {}
-  local function icon(id)
+  local function mapIcon(id)
     if icons[id] ~= nil then return icons[id] or nil end
     local set = ctx.iconMaps
-    local map = set.icons[id] or set.icons.mods
+    local map = set.icons[id]
+    if not map then return nil end
     local size = set.size or 16
     local ok, img = pcall(function()
       local data = love.image.newImageData(size, size)
@@ -42,6 +43,69 @@ return function(ctx)
     end)
     icons[id] = ok and img or false
     return ok and img or nil
+  end
+
+  -- extra CUSTOM ICONS choices: one row of 16x16 coloured frames
+  local atlas, atlasQuads, atlasFailed
+  local function atlasQuad(id)
+    local spec = ctx.iconMaps.atlas
+    if not (spec and spec.frames and spec.frames[id] ~= nil) then return nil end
+    if not atlas and not atlasFailed then
+      local ok, img = pcall(function() return ctx.mod.assets:image(spec.file) end)
+      if ok and img then
+        if img.setFilter then img:setFilter("nearest", "nearest") end
+        atlas, atlasQuads = img, {}
+        local w, h = img:getDimensions()
+        local size = ctx.iconMaps.size or 16
+        for name, frame in pairs(spec.frames) do
+          if (frame + 1) * size <= w and h >= size then
+            atlasQuads[name] = love.graphics.newQuad(frame * size, 0, size, size, w, h)
+          end
+        end
+      else
+        atlasFailed = true
+        if ctx.mod.log then ctx.mod.log:warn("custom icons: %s", tostring(img)) end
+      end
+    end
+    return atlasQuads and atlasQuads[id] or nil
+  end
+
+  -- true when id is a drawable icon (map or strip)
+  function D.hasIcon(id)
+    return ctx.iconMaps.icons[id] ~= nil
+      or (ctx.iconMaps.atlas and ctx.iconMaps.atlas.frames[id] ~= nil) or false
+  end
+
+  -- draw icon `id` with its top-left at x, y (falls back to MODS)
+  function D.icon(id, x, y)
+    love.graphics.setColor(1, 1, 1, 1)
+    local img = mapIcon(id)
+    if img then love.graphics.draw(img, math.floor(x), math.floor(y)) return end
+    local quad = atlasQuad(id)
+    if quad then love.graphics.draw(atlas, quad, math.floor(x), math.floor(y)) return end
+    img = mapIcon("mods")
+    if img then love.graphics.draw(img, math.floor(x), math.floor(y)) end
+  end
+
+  -- AUTO icon for another mod's item: a word in its name or id, else MODS
+  function D.autoIcon(text)
+    text = tostring(text or ""):upper()
+    for _, pair in ipairs(ctx.iconMaps.auto or {}) do
+      if text:find(pair[1], 1, true) then return pair[2] end
+    end
+    return "mods"
+  end
+
+  -- the icon a slot shows: built-ins their own, other mods' items the
+  -- CUSTOM ICONS choice (AUTO = from the name)
+  function D.iconFor(slot)
+    if not slot then return "mods" end
+    if not slot.extra then return slot.id end
+    local key = slot.iconKey or S.iconKey(slot.entry)
+    local choice = S.iconFor(key)
+    if choice ~= "auto" and D.hasIcon(choice) then return choice end
+    local e = type(slot.entry) == "table" and slot.entry or {}
+    return D.autoIcon(tostring(e.id or "") .. " " .. tostring(slot.label or e.label or "") .. " " .. tostring(key))
   end
 
   -- ------- theme
@@ -110,7 +174,8 @@ return function(ctx)
     if right and right ~= "" then
       local ok, w = pcall(FrlgFont.measure, right, { small = true })
       w = ok and tonumber(w) or (#right * 5)
-      FrlgFont.draw(right, 235 - w, 2, { colors = BAR_TEXT, small = true })
+      -- the small font sits low in its cell: -1 lines it up with the left text
+      FrlgFont.draw(right, 235 - w, -1, { colors = BAR_TEXT, small = true })
     end
     love.graphics.setColor(1, 1, 1, 1)
   end
@@ -144,18 +209,17 @@ return function(ctx)
       love.graphics.setLineWidth(1)
     end
     -- coloured icon
-    local img = icon(slot.extra and "mods" or slot.id)
-    if img then
-      love.graphics.setColor(1, 1, 1, 1)
-      love.graphics.draw(img, x + 6, y + math.floor((h - 16) / 2))
-    end
+    D.icon(D.iconFor(slot), x + 6, y + math.floor((h - 16) / 2))
     FrlgFont.draw(slot.label or "", x + 27, y + 5, { colors = WHITE_TEXT })
     love.graphics.setColor(1, 1, 1, 1)
   end
 
+  -- draws the page the cursor is on (a held tile shows when it's on that page)
   function D.grid(slots, cursor, theme, opts)
     opts = opts or {}
-    for i = 1, L.SLOTS do
+    local page = L.pageOf(cursor or 1)
+    local first = (page - 1) * L.PAGE + 1
+    for i = first, math.min(L.total(slots), first + L.PAGE - 1) do
       local slot = slots[i]
       if slot then
         local held = opts.held == i
@@ -165,6 +229,46 @@ return function(ctx)
         })
       end
     end
+  end
+
+  -- "1/2" page text for the top bar (nil with a single page)
+  function D.pageText(slots, cursor)
+    local pages = L.pages(slots)
+    if pages <= 1 then return nil end
+    return string.format("%d/%d", L.pageOf(cursor or 1), pages)
+  end
+
+  -- a rounded icon badge (CUSTOM ICONS picker)
+  function D.badge(id, x, y, w, h, theme, selected)
+    local r = 5
+    love.graphics.setColor(0, 0, 0, 0.40)
+    love.graphics.rectangle("fill", x + 1, y + 2, w, h, r, r)
+    setc(selected and BODY_SEL or BODY, 0.97)
+    love.graphics.rectangle("fill", x, y, w, h, r, r)
+    love.graphics.setColor(1, 1, 1, 0.06)
+    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, math.floor(h / 2) - 2, r - 2, r - 2)
+    love.graphics.setLineWidth(1)
+    setc(selected and theme.light or EDGE)
+    love.graphics.rectangle("line", x + 0.5, y + 0.5, w - 1, h - 1, r, r)
+    if selected then
+      local pulse = 0.55 + 0.45 * math.abs(math.sin(now() * 3))
+      love.graphics.setLineWidth(2)
+      setc(theme.main, pulse)
+      love.graphics.rectangle("line", x - 1, y - 1, w + 2, h + 2, r + 1, r + 1)
+      love.graphics.setLineWidth(1)
+    end
+    D.icon(id, x + math.floor((w - 16) / 2), y + math.floor((h - 16) / 2))
+  end
+
+  -- plain white text (CUSTOM ICONS picker)
+  function D.text(text, x, y)
+    FrlgFont.draw(tostring(text or ""), x, y, { colors = WHITE_TEXT })
+    love.graphics.setColor(1, 1, 1, 1)
+  end
+
+  function D.textWidth(text)
+    local ok, w = pcall(FrlgFont.measure, tostring(text or ""))
+    return ok and tonumber(w) or (#tostring(text or "") * 6)
   end
 
   -- ------- native "RETURN TO MAIN MENU?" prompt, drawn over the grid

@@ -12,7 +12,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 > [!NOTE]
 > Project Highlander Gen3 only runs in the five Gen 3 games. For Red / Blue / Yellow / Gold / Silver / Crystal, use [Project Highlander](https://github.com/Waifu4Life/Project-Highlander-A-Modern-UI-Suite-Fork), a separate mod.
 
-**Current release:** 1.70.0 (BETA)
+**Current release:** 1.78.0 (BETA)
 **Requires:** G1R Deluxe 0.3.89 or newer (built against 0.3.97)
 
 ---
@@ -131,7 +131,8 @@ A two-column, five-row Start Menu with flat coloured icon buttons.
 
 - **FireRed / LeafGreen:** Pokédex, Pokémon, Bag, PokéBox, Trainer, Save, Options, Mods, Exit.
 - **Ruby / Sapphire / Emerald:** the same, plus PokéNav.
-- **Exit** always stays bottom-right.
+- **Items from other mods** (a DexNav entry, for example) get their own tiles. With more than nine items besides Exit, the menu gets a 2nd page (or more): Up / Down go from page to page and wrap round, Left / Right switch column, and the page (e.g. 1/2) shows at the top right.
+- **Exit** always stays bottom-right of the last page.
 - **Save** stays in the Start Menu: the save prompts appear on top of it and you're back on Save afterwards.
 - **Select** on the Start Menu opens the Sort Menu.
 
@@ -139,10 +140,25 @@ A two-column, five-row Start Menu with flat coloured icon buttons.
 |---|---|
 | Enable | On / Off |
 | Clock | Day, date and device time bar (Hoenn alternates with the in-game clock). |
+| Custom Icons | Pick the icon of each item other mods add to the Start Menu (see below). |
 | PokéBox | Bill's PC "Move Pokémon" from anywhere; leaving it returns to the Start Menu. |
 | Save Theme | **Per Game** or Per Save |
-| Sort Menu | Arrange the Start Menu items. |
+| Sort Menu | Arrange the Start Menu items (see below). |
 | Theme | **Auto** (follows the game), FireRed, LeafGreen, Ruby, Sapphire, Emerald |
+
+**Sort Menu** (Select on the Start Menu, or Start Menu Settings → Sort Menu)
+
+- A picks an item up, A on another item swaps the two. B drops it, or leaves when nothing is held.
+- **Select** resets to the default order, with other mods' items after the built-in ones.
+- Other mods' items move like the built-in ones. Exit stays bottom-right of the last page.
+- One order is shared by all five games; items a game doesn't have are skipped.
+
+**Custom Icons**
+
+- Lists the items other mods add to the Start Menu. They're remembered once seen, so they stay listed even when they're not in the menu right now.
+- A opens a picker of 32 coloured icons: the Start Menu's own, plus Menu, Link, Quest, Map, Music, Camera, Trophy, Heart, Star, Tools, Key, Clock, Mail, Chat, Home, Shop, Chest, Battle, Potion, Bike, Craft and Search. A dot marks the icon in use.
+- **Auto** (default) picks an icon from the item's name (Jukebox / Music → Music, Map → Map…), otherwise the Mods icon. **Select** on an item puts it back to Auto.
+- Shared by all five games.
 
 ## Party
 
@@ -321,7 +337,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Option | How it works |
 |---|---|
 | Get Other Game Exclusives | Each exclusive pair (Ekans / Sandshrew, Oddish / Bellsprout, Psyduck / Slowpoke, Growlithe / Vulpix, Shellder / Staryu, Scyther / Pinsir and their evolutions) has a 50% chance to be the other game's. Both games get Electabuzz in the Power Plant and Magmar on Mt. Ember. |
-| Trade with Link C. | The Game Boy kid on his own in the Celadon Dept. Store trade-evolves Kadabra, Haunter, Graveler and Machoke with the trade and evolution scenes, then trades them back. |
+| Trade with Link C. | The Game Boy kid on his own in the Celadon Dept. Store trade-evolves Kadabra, Haunter, Graveler and Machoke with the trade and evolution scenes, then trades them back. With the **National Pokédex**, he also does the held-item trade evolutions: Poliwhirl or Slowpoke with a King's Rock, Onix or Scyther with a Metal Coat, Seadra with a Dragon Scale, Porygon with an Up-Grade, Clamperl with a DeepSeaTooth / DeepSeaScale (the item is used up, like a real trade). On the trade back, his own Pokémon shows evolved too. |
 | Infinite Tries for Rare PKMN | Articuno, Zapdos, Moltres, Mewtwo, both Snorlax, the roaming beasts, Lugia, Ho-Oh, etc. |
 | Get All Starters | Two steps. **1.** With 8 badges, Oak offers the Poké Ball left on his table: the starter neither you nor your rival picked (your 2nd). **2.** Then, as Champion with Mewtwo first in your party, he gives you a baby of your rival's starter (Lv 5, your 3rd). |
 | Get Other Fossil | With 8 badges, Miguel on Mt. Moon B2F trades you the fossil you didn't pick. |
@@ -334,7 +350,7 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | Option | How it works |
 |---|---|
 | Get Other Game Exclusives | Ruby / Sapphire: Seedot / Lotad, Nuzleaf / Lombre, Mawile / Sableye, Zangoose / Seviper and Solrock / Lunatone each have a 50% chance to be the other version's. Emerald: Seviper → Zangoose and Solrock → Lunatone at 50%, and Surskit, Meditite, Medicham and Roselia get Ruby / Sapphire's slots. |
-| Trade with Link C. | The GameCube in your room trade-evolves Kadabra, Graveler, Machoke, Seadra (Dragon Scale) and Clamperl (DeepSeaTooth / DeepSeaScale), then trades them back. |
+| Trade with Link C. | The GameCube in your room trade-evolves Kadabra, Haunter, Graveler and Machoke, plus the held-item evolutions: Poliwhirl or Slowpoke (King's Rock), Onix or Scyther (Metal Coat), Seadra (Dragon Scale), Porygon (Up-Grade) and Clamperl (DeepSeaTooth / DeepSeaScale), then trades them back. Works right away: Hoenn has no National Dex rule for evolving. On the trade back, its own Pokémon shows evolved too. |
 | Infinite Tries for Rare PKMN | The Regis, Groudon, Kyogre, Rayquaza, Latias / Latios, Jirachi, Deoxys, Mew, Lugia, Ho-Oh and Sudowoodo stay until you catch them. |
 | Get All Starters | Two steps. **1.** With 8 badges, talk to Birch: the starter neither you nor your rival picked waits on his lab table (your 2nd). **2.** Then, as Champion with Latias or Latios first in your party, Birch gives you a baby of your rival's starter (Lv 5, your 3rd). |
 | Get Other Fossil | **Ruby / Sapphire.** With 8 badges and your fully evolved fossil Pokémon first in the party, the Devon scientist gives you the other one. |
@@ -382,4 +398,5 @@ This is a **BETA**, so feedback helps a lot. When reporting a bug, please includ
 ## Credits
 
 - **poooooby** — Wilds of Hoenn; Jirachi and Deoxys HGSS overworld sprites used with permission (see Wilds of Hoenn's THIRD_PARTY_NOTICES.md for the art's original credits)
+- **NikoIchu** — Pixel Icons (CC0), the base of the Custom Icons artwork (coloured for Gen3 from Project Highlander's 16×16 strip)
 - **Waifu4Life** — Project Highlander Gen3: menus, QoL, Regional Dex tools, Johto Pokémon Helper, rumble, integration

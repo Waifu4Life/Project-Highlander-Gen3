@@ -89,6 +89,8 @@ return function(mod)
     fairy_type = false, -- set by the future Fairy feature
     theme_scope = "game", -- "game" | "save"
     start_order = table.concat(S.DEFAULT_ORDER, ","),
+    start_icons = "",      -- "KEY=icon,KEY=icon" (CUSTOM ICONS for other mods' items)
+    start_icon_items = "", -- "KEY=LABEL|KEY=LABEL" (other mods' items seen so far)
   }
 
   local function liveGame()
@@ -198,7 +200,8 @@ return function(mod)
     local out, seen = {}, {}
     if type(raw) == "string" then
       for id in raw:gmatch("[^,%s]+") do
-        if S.KNOWN[id] and not seen[id] then
+        -- built-in ids, and "x:<KEY>" for other mods' items (see S.extraKey)
+        if (S.KNOWN[id] or id:match("^x:[%w_]+$")) and not seen[id] then
           out[#out + 1] = id
           seen[id] = true
         end
@@ -210,12 +213,96 @@ return function(mod)
     return out
   end
 
+  -- order key of another mod's item
+  function S.extraKey(iconKey)
+    return "x:" .. tostring(iconKey or "ITEM")
+  end
+
   function S.setOrder(list)
     S.set("start_order", table.concat(list, ","))
   end
 
   function S.resetOrder()
     S.set("start_order", table.concat(S.DEFAULT_ORDER, ","))
+  end
+
+  -- ------- custom icons for other mods' Start Menu items (shared by all games)
+
+  -- stable key for an entry: its id, else its label (letters/digits only)
+  function S.iconKey(entry)
+    if type(entry) ~= "table" then return "ITEM" end
+    local raw
+    if type(entry.id) == "string" and entry.id ~= "" then
+      raw = "ID_" .. entry.id
+    else
+      raw = "LB_" .. tostring(entry.label or "ITEM")
+    end
+    raw = raw:upper():gsub("[^%w]", "_")
+    return raw
+  end
+
+  local function parsePairs(raw, sep)
+    local out, list = {}, {}
+    if type(raw) ~= "string" then return out, list end
+    for part in raw:gmatch("[^" .. sep .. "]+") do
+      local k, v = part:match("^([%w_]+)=(.*)$")
+      if k and v ~= "" and out[k] == nil then
+        out[k] = v
+        list[#list + 1] = k
+      end
+    end
+    return out, list
+  end
+
+  function S.icons()
+    return (parsePairs(S.get("start_icons"), ","))
+  end
+
+  -- "auto" when the player has not picked one
+  function S.iconFor(key)
+    local v = S.icons()[key]
+    return (type(v) == "string" and v ~= "") and v or "auto"
+  end
+
+  function S.setIcon(key, value)
+    local map, list = parsePairs(S.get("start_icons"), ",")
+    if value == nil or value == "auto" then
+      map[key] = nil
+    else
+      if map[key] == nil then list[#list + 1] = key end
+      map[key] = value
+    end
+    local parts = {}
+    for _, k in ipairs(list) do
+      if map[k] then parts[#parts + 1] = k .. "=" .. map[k] end
+    end
+    S.set("start_icons", table.concat(parts, ","))
+  end
+
+  -- other mods' items, remembered so CUSTOM ICONS lists them even before
+  -- START has been opened this session
+  function S.iconItems()
+    local map, list = parsePairs(S.get("start_icon_items"), "|")
+    local out = {}
+    for _, k in ipairs(list) do out[#out + 1] = { key = k, label = map[k] } end
+    return out
+  end
+
+  function S.rememberIconItems(items)
+    local map, list = parsePairs(S.get("start_icon_items"), "|")
+    local changed = false
+    for _, it in ipairs(items or {}) do
+      local label = tostring(it.label or "ITEM"):gsub("[|=,]", " ")
+      if it.key and map[it.key] ~= label then
+        if map[it.key] == nil then list[#list + 1] = it.key end
+        map[it.key] = label
+        changed = true
+      end
+    end
+    if not changed then return end
+    local parts = {}
+    for _, k in ipairs(list) do parts[#parts + 1] = k .. "=" .. map[k] end
+    S.set("start_icon_items", table.concat(parts, "|"))
   end
 
   return S

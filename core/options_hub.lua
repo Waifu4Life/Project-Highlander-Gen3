@@ -35,6 +35,12 @@ return function(ctx)
     return {
       toggleRow("start_enabled", "ENABLE", "start_enabled"),
       toggleRow("clock", "CLOCK", "clock"),
+      {
+        id = "ph3_custom_icons", label = "CUSTOM ICONS", value = function() return "" end,
+        activate = function(c)
+          ctx.iconScreen.show({ session = c and c.session })
+        end,
+      },
       toggleRow("pokebox", "POKéBOX", "pokebox"),
       {
         id = "ph3_theme_scope", label = "SAVE THEME",

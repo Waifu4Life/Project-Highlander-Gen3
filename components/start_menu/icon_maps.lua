@@ -1,6 +1,43 @@
 -- 16x16 coloured icons. Each character is a palette colour; "." is transparent.
+-- The built-in items are drawn from the maps below; the extra CUSTOM ICONS
+-- choices come from the coloured strip in assets/start_menu/custom_icons.png.
 return {
   size = 16,
+  atlas = {
+    file = "assets/start_menu/custom_icons.png",
+    frames = {
+      generic = 0, link = 1, quest = 2, map = 3, music = 4, camera = 5,
+      trophy = 6, heart = 7, star = 8, tools = 9, key = 10, clock = 11,
+      mail = 12, chat = 13, home = 14, shop = 15, chest = 16, battle = 17,
+      potion = 18, bicycle = 19, craft = 20, search = 21,
+    },
+  },
+  -- CUSTOM ICONS picker: { label, icon id }, in picker order (8 x 4 = 32)
+  choices = {
+    { "AUTO", "auto" }, { "DEX", "pokedex" }, { "PKMN", "pokemon" },
+    { "BAG", "bag" }, { "BOX", "pokebox" }, { "ID", "trainer" },
+    { "SAVE", "save" }, { "OPTIONS", "option" }, { "MODS", "mods" },
+    { "NAV", "pokenav" }, { "MENU", "generic" }, { "LINK", "link" },
+    { "QUEST", "quest" }, { "MAP", "map" }, { "MUSIC", "music" },
+    { "CAMERA", "camera" }, { "TROPHY", "trophy" }, { "HEART", "heart" },
+    { "STAR", "star" }, { "TOOLS", "tools" }, { "KEY", "key" },
+    { "CLOCK", "clock" }, { "MAIL", "mail" }, { "CHAT", "chat" },
+    { "HOME", "home" }, { "SHOP", "shop" }, { "CHEST", "chest" },
+    { "BATTLE", "battle" }, { "POTION", "potion" }, { "BIKE", "bicycle" },
+    { "CRAFT", "craft" }, { "SEARCH", "search" },
+  },
+  -- AUTO: words in an item's name/id that pick its icon (else MODS)
+  auto = {
+    { "JUKEBOX", "music" }, { "MUSIC", "music" }, { "RADIO", "music" }, { "SONG", "music" },
+    { "MAP", "map" }, { "QUEST", "quest" }, { "TASK", "quest" }, { "MAIL", "mail" },
+    { "SHOP", "shop" }, { "MART", "shop" }, { "STORE", "shop" }, { "KEY", "key" },
+    { "CLOCK", "clock" }, { "TIME", "clock" }, { "CAMERA", "camera" }, { "PHOTO", "camera" },
+    { "BIKE", "bicycle" }, { "BICYCLE", "bicycle" }, { "SEARCH", "search" }, { "FIND", "search" },
+    { "CHAT", "chat" }, { "TALK", "chat" }, { "HOME", "home" }, { "BATTLE", "battle" },
+    { "FIGHT", "battle" }, { "TROPHY", "trophy" }, { "RECORD", "trophy" }, { "LINK", "link" },
+    { "TRADE", "link" }, { "CRAFT", "craft" }, { "POTION", "potion" }, { "HEAL", "potion" },
+    { "CHEST", "chest" }, { "STAR", "star" }, { "HEART", "heart" }, { "TOOL", "tools" },
+  },
   palette = {
     k = { 0.094, 0.094, 0.118 },
     w = { 0.973, 0.973, 0.973 },

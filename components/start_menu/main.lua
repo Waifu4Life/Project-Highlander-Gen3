@@ -47,11 +47,18 @@ return function(ctx)
     G.active = true
     -- keep the game's remembered cursor (pret start_menu.c sStartMenuCursorPos)
     G.cursor = nil
-    for i = 1, L.SLOTS do
+    for i = 1, L.total(slots) do
       local s = slots[i]
       if s and s.index == StartMenu.cursor then G.cursor = i break end
     end
     G.cursor = G.cursor or L.firstFilled(slots)
+    -- other mods' items, so OPTIONS > START MENU SETTINGS > CUSTOM ICONS lists them
+    local seen = {}
+    for i = 1, L.total(slots) do
+      local s = slots[i]
+      if s and s.extra then seen[#seen + 1] = { key = s.iconKey, label = s.label } end
+    end
+    if #seen > 0 then pcall(S.rememberIconItems, seen) end
     -- full-screen layer: the overworld is not drawn behind the grid
     local Stack = require("src.ui.game3.stack")
     for _, layer in ipairs(Stack._layers or {}) do
@@ -161,7 +168,8 @@ return function(ctx)
       love.graphics.push("all")
       local theme = D.theme(StartMenu._session)
       D.background(theme)
-      D.barText(S.flag("clock") and D.clockText(StartMenu._session) or "MENU", nil)
+      D.barText(S.flag("clock") and D.clockText(StartMenu._session) or "MENU",
+        D.pageText(G.slots, G.cursor))
       D.grid(G.slots, G.cursor, theme)
       love.graphics.pop()
       if StartMenu._confirmExit then D.exitPrompt(StartMenu) end

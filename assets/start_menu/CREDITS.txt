@@ -1,0 +1,9 @@
+custom_icons.png - the CUSTOM ICONS picker's extra icons (16x16, one row).
+
+Coloured for Project Highlander Gen3 from the 16x16 Start Menu icon strip of
+Project Highlander (Gen 1/2), which is redrawn from NikoIchu's CC0 "Pixel
+Icons" (CC0 1.0 Universal, public domain dedication).
+
+Frame order (must match components/start_menu/icon_maps.lua, atlas.frames):
+generic, link, quest, map, music, camera, trophy, heart, star, tools, key,
+clock, mail, chat, home, shop, chest, battle, potion, bicycle, craft, search

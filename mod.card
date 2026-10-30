@@ -13,6 +13,7 @@ return {
       "Themes: Auto, FireRed, LeafGreen, Ruby, Sapphire, Emerald (per game or per save)",
       "Day, date and clock bar (device clock; rotates with in-game time in Hoenn)",
       "Sort Menu to arrange the Start Menu items",
+      "Start Menu pages when other mods add more items, and Custom Icons for those items",
       "PC: Auto-Grab (SELECT) and Multiple selection, including party swaps",
       "Party: SELECT quick switch and a scroll bar for long A menus",
       "Bag: 255-item limit with counter; START sort menu; SELECT opens the TM Case (FR/LG)",
