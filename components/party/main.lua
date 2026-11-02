@@ -5,6 +5,8 @@
 --   * A menu order: SUMMARY (Stats), ROLE, SWITCH, ITEM (or MAIL), RELEARN,
 --     HM field moves, other (TM) field moves, CANCEL. ROLE comes from Wilds of
 --     Hoenn, RELEARN from a later mod; they only show when those mods add them.
+--   * RENAME (after RELEARN): the game's own nickname screen, for any
+--     Pokemon but an Egg. Left blank, it goes back to the species name.
 --   * More than 8 entries in the A menu: 8 are shown at a time with a scroll
 --     bar and small up/down arrows when there's more above or below.
 --
@@ -48,6 +50,7 @@ return function(ctx)
     if a == "SWITCH" then return 3 end
     if a == "ITEM" or a == "MAIL" then return 4 end
     if startsWith(a, "RELEARN") then return 6 end
+    if a == "RENAME" then return 6.5 end
     if a == "CANCEL" then return 9 end
     if HM[a] then return 7 end
     if TM[a] then return 8 end
@@ -145,6 +148,99 @@ return function(ctx)
     end
   end
 
+  -- ------- RENAME
+
+  local RENAME = "RENAME"
+
+  local function isEgg(mon)
+    return type(mon) == "table" and (mon.isEgg == true or mon.egg == true)
+  end
+
+  local function addRename()
+    local list = PartyMenu.ACTIONS
+    if list ~= P.fieldList and not isFieldList(list) then return end
+    if not isFieldList(list) or indexOf(list, RENAME) then return end
+    local mon = PartyMenu._party and PartyMenu._party[PartyMenu.cursor]
+    if not mon or isEgg(mon) then return end
+    local old = PartyMenu._actionTexts
+    local texts = {}
+    for i, act in ipairs(list) do
+      local t = (type(old) == "table" and old.list == list and type(old.texts) == "table") and old.texts[i] or nil
+      if t == nil then
+        local ok, v = pcall(PartyMenu._cursorOptionText, act)
+        t = (ok and v ~= nil) and v or act
+      end
+      texts[i] = t
+    end
+    local at = indexOf(list, "CANCEL") or (#list + 1)
+    table.insert(list, at, RENAME)
+    table.insert(texts, at, RENAME)
+    PartyMenu._actionTexts = { list = list, texts = texts }
+  end
+
+  local function destroyPartyOam()
+    local okO, Oam = pcall(require, "src.core.game3.oam")
+    if not (okO and type(Oam) == "table") then return end
+    local slots = PartyMenu._oam
+    if slots then
+      for i = 1, 6 do
+        local s = slots[i]
+        if s then
+          for _, k in ipairs({ "mon", "ball", "status", "item" }) do
+            if s[k] ~= nil then pcall(Oam.destroySprite, s[k]) end
+          end
+        end
+      end
+    end
+    if PartyMenu._summaryIcon ~= nil then pcall(Oam.destroySprite, PartyMenu._summaryIcon) end
+    PartyMenu._oam, PartyMenu._summaryIcon = nil, nil
+  end
+
+  local function openRename()
+    local mon = PartyMenu._party and PartyMenu._party[PartyMenu.cursor]
+    if not mon or isEgg(mon) then return false end
+    local Naming = require("src.ui.game3.naming")
+    local species = tonumber(mon.species or mon.speciesId) or 1
+    local title
+    pcall(function()
+      local Pokemon = require("src.core.game3.pokemon")
+      local name = Pokemon.name(species)
+      if type(name) ~= "string" or name == "" then name = Pokemon.displayMonName(mon) end
+      title = Naming.monTitle(name)
+    end)
+    se(5)
+    PartyMenu.mode = "list"
+    destroyPartyOam()
+    -- same screen as the Name Rater (pret ChangePokemonNickname)
+    local ok, err = pcall(Naming.open, {
+      title = title,
+      template = "NICKNAME",
+      maxLen = 10,
+      species = species,
+      personality = mon.personality,
+      gender = mon.gender,
+      session = PartyMenu._session,
+      onDone = function(name)
+        if type(name) == "string" and name ~= "" then
+          mon.nickname = name
+        else
+          -- left blank: back to the species name, like the games do
+          pcall(function()
+            local sname = require("src.core.game3.pokemon").name(species)
+            if type(sname) == "string" and sname ~= "" then mon.nickname = sname end
+          end)
+        end
+        PartyMenu.mode = "list"
+        pcall(PartyMenu.reloadSprites)
+      end,
+    })
+    if not ok then
+      if ctx.mod.log then ctx.mod.log:warn("rename: %s", tostring(err)) end
+      pcall(PartyMenu.reloadSprites)
+    end
+    return true
+  end
+
   -- ------- input
 
   local function handleInput(input, ...)
@@ -167,8 +263,18 @@ return function(ctx)
       for _, k in ipairs({ "up", "down", "a", "b" }) do
         if input:wasPressed(k) then P.touched = true break end
       end
+      if input:wasPressed("a") and PartyMenu.ACTIONS == P.fieldList
+          and PartyMenu.ACTIONS[PartyMenu.actionCursor or 1] == RENAME then
+        local okR, done = pcall(openRename)
+        if okR and done then return end
+      end
     end
     P.orig.handleInput(input, ...)
+    if before == "list" and PartyMenu.mode == "action" then
+      P.fieldList = PartyMenu.ACTIONS
+      local okA, errA = pcall(addRename)
+      if not okA and ctx.mod.log then ctx.mod.log:warn("rename row: %s", tostring(errA)) end
+    end
     track(before)
   end
 

@@ -5,6 +5,7 @@
 --   Infinite Safari, Run Everywhere,
 --   Sparkling Hidden Items, Use Repel Again?        -> field.lua
 --   Rematch Anyone, Anytime                         -> rematch.lua
+--   Safari Zone: Unlimited Balls, No Running Away   -> safari.lua
 --   Decapitalize Words                              -> decap.lua (installed first, from main.lua)
 --
 -- Every patch is installed on its own: if a game module is not loaded yet (or
@@ -38,7 +39,7 @@ return function(ctx)
   ctx.qolPatch = patch
 
   local parts = {}
-  for _, name in ipairs({ "exp", "unlimited_pp", "field", "rematch" }) do
+  for _, name in ipairs({ "exp", "unlimited_pp", "field", "rematch", "safari" }) do
     local ok, part = pcall(function() return loadLocal("components/qol/" .. name .. ".lua")(ctx, patch) end)
     if ok and type(part) == "table" then
       parts[#parts + 1] = part

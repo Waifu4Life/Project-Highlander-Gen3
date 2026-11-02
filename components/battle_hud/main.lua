@@ -3,6 +3,16 @@
 --                       (like the player's), on a small plate below the box.
 --   COLORED MOVE NAMES: each move name sits in a rounded box filled with the
 --                       move's type colour (Gen 1/2 Battle HUD style).
+--   DISPLAY EFFECTIVENESS: 0x / ½x / 1x / 2x for the selected move against
+--                       the foe (the one you target in doubles). FR/LG and
+--                       Emerald: in a small box in the panel's top-left
+--                       corner (left empty for status moves), with PP moved
+--                       next to its numbers. Ruby/Sapphire (narrower panel): the same
+--                       box in the bottom-right corner. Damaging moves only; ¼x shows as ½x
+--                       and 4x as 2x (same icons as Gen 1/2).
+--   RUBY/SAPPHIRE MOVE ARROW (always on): the move menu gets the ▶ arrow of
+--                       FR/LG/Emerald instead of Ruby's box cursor; the move
+--                       names move right to make room for it.
 --   LOW HP WARNING:     NORMAL = the game's looping beep while your HP bar is
 --                       red. REDUCED = a few beeps when the bar turns red, then
 --                       quiet until it leaves the red and comes back (or another
@@ -11,9 +21,16 @@ return function(ctx, TypeColors)
   local B = { installed = false }
   local S = ctx.settings
 
-  local Ui, Moves, Types, FrlgFont, Healthbox
+  local Ui, Moves, Types, FrlgFont, Healthbox, RomText
   local inMoveDraw = false
   local pendingMove = nil
+  local moveMenu = false   -- the move menu is being drawn (any layout)
+  local layoutNow = "frlg" -- "frlg" | "emerald" | "rs" while it's drawn
+  local lastName = nil     -- the move name about to be drawn
+  local nameColors = nil   -- colours the move names are drawn with
+  local arrowAt = nil      -- Ruby/Sapphire: where the arrow goes
+  local rsTypeIcon = nil   -- Ruby/Sapphire: icon key waiting for the TYPE row
+  local rsBox = false      -- Ruby/Sapphire: draw the box after the TYPE row
 
   local function c5(v) return math.floor(v * 255 / 31 + 0.5) / 255 end
   local CREAM = { c5(31), c5(31), c5(27), 1 }
@@ -159,6 +176,149 @@ return function(ctx, TypeColors)
     love.graphics.setColor(1, 1, 1, 1)
   end
 
+  -- ------- effectiveness icons (the user's Gen 1/2 artwork, 7 px tall)
+
+  local DIGITS = {
+    ["0"] = { ".###.", "##.##", "##.##", "##.##", "##.##", "##.##", ".###." },
+    ["1"] = { ".##..", "###..", ".##..", ".##..", ".##..", ".##..", "####." },
+    ["2"] = { ".###.", "##.##", "...##", "..##.", ".##..", "##...", "#####" },
+    half = { ".#....#.", "##....#.", ".#...#..", "###.#...", "...#.##.",
+      "..#....#", ".#....#.", "#....###" },
+  }
+  local SMALL_X = { "##.##", ".###.", "..#..", ".###.", "##.##" }
+
+  -- icon tops below the text's y (tuned on the screenshots): the 7-row
+  -- digits end on the numbers' bottom row
+  local ICON_DY = { frlg = 4, emerald = 4, rs = 6 }
+  local RS_ICON_RIGHT = 231 -- Ruby/Sapphire: right end of the TYPE row
+  local PP_NUMBERS_X = 202  -- FR/LG: where the PP numbers start
+
+  local function blit(map, x, y)
+    for r, line in ipairs(map) do
+      for c = 1, #line do
+        if line:sub(c, c) == "#" then love.graphics.rectangle("fill", x + c - 1, y + r - 1, 1, 1) end
+      end
+    end
+  end
+
+  local function iconWidth(key)
+    return #DIGITS[key][1] + 1 + #SMALL_X[1]
+  end
+
+  -- y: top of a 7-row icon; the 8-row ½ starts a row higher
+  local function drawIcon(key, x, y, colors)
+    local map = DIGITS[key]
+    if not map then return end
+    if #map > 7 then y = y - 1 end
+    local fg = (type(colors) == "table" and type(colors.fg) == "table") and colors.fg or INK
+    love.graphics.push("all")
+    love.graphics.setColor(fg[1], fg[2], fg[3], 1)
+    blit(map, x, y)
+    blit(SMALL_X, x + #map[1] + 1, y + #map - 5)
+    love.graphics.pop()
+  end
+
+  local function alive(b)
+    local mon = b and b.mon
+    return type(mon) == "table" and (tonumber(mon.hp) or 0) > 0
+  end
+
+  -- the foe the selected move is checked against (nil: don't show)
+  local function defender(st, ab)
+    if not st.double then return st.enemy end
+    local t = Ui._target
+    if Ui._mode == "target" and type(t) == "table" and t.cursor ~= nil then
+      local b = st.battlers and st.battlers[t.cursor]
+      if b and b.side ~= "player" and b ~= ab then return b end
+      return nil
+    end
+    local foes = {}
+    for _, id in ipairs({ 1, 3 }) do
+      local b = st.battlers and st.battlers[id]
+      if alive(b) then foes[#foes + 1] = b end
+    end
+    return #foes == 1 and foes[1] or nil
+  end
+
+  -- "0" / "half" / "1" / "2" for the move under the cursor, or nil
+  local function effectKey()
+    if not S.flag("battle_effectiveness") then return nil end
+    local st = battleState()
+    if not st or Ui._swap then return nil end
+    if st.ghostBattle then
+      local Anim = require("src.core.game3.battle.anim")
+      local pg = Anim.present and Anim.present("enemy")
+      if not (pg and pg.ghostUnveiled) then return nil end
+    end
+    local ab = (Ui.activeBattlerObject and Ui.activeBattlerObject(st)) or st.player
+    local mon = ab and ab.mon
+    local slot = Ui._moveIndex or 1
+    local mv = mon and mon.moves and mon.moves[slot]
+    if not mv or mv == 0 or mv == "" then return nil end
+    local def = Moves.get(mv)
+    if not def or (tonumber(def.power) or 0) == 0 then return nil end -- damaging moves only
+    local foe = defender(st, ab)
+    if not alive(foe) then return nil end
+    local moveType = Ui.moveTypeOf(mon, slot, def)
+    local mult = tonumber(Types.effectiveness(moveType, foe.type1, foe.type2))
+    if not mult then return nil end
+    if mult <= 0 then return "0" end
+    if mult < 1 then return "half" end
+    if mult == 1 then return "1" end
+    return "2"
+  end
+
+  local function ppLabel()
+    local ok, t = pcall(RomText.plain, "gText_MoveInterfacePP")
+    return ok and t or "PP"
+  end
+
+  -- FR/LG and Emerald: a small box in the panel's top-left corner holds the
+  -- icon (empty for status moves, so the panel always looks the same), and
+  -- PP moves right, next to its numbers. Offsets from the PP label's origin.
+  local BOX = { frlg = { dx = -3, dy = -5 }, emerald = { dx = -1, dy = -2 } }
+  local BOX_W, BOX_H = 16, 11
+  local PP_GAP = 4 -- between PP and its numbers
+  -- Ruby/Sapphire: the box flush in the panel's bottom-right corner (the
+  -- white inside of the panel ends at x 233, y 155; measured on a screenshot)
+  local RS_BOX_X, RS_BOX_Y = 220, 145
+
+  local function drawBox(bx, by, colors)
+    local fg = (type(colors) == "table" and type(colors.fg) == "table") and colors.fg or INK
+    love.graphics.push("all")
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.rectangle("fill", bx, by, BOX_W, BOX_H)
+    love.graphics.setColor(fg[1], fg[2], fg[3], 1)
+    love.graphics.rectangle("fill", bx, by, BOX_W, 1)
+    love.graphics.rectangle("fill", bx, by + BOX_H - 1, BOX_W, 1)
+    love.graphics.rectangle("fill", bx, by, 1, BOX_H)
+    love.graphics.rectangle("fill", bx + BOX_W - 1, by, 1, BOX_H)
+    love.graphics.pop()
+  end
+
+  -- Returns the new x for the PP label.
+  local function placePp(text, x, y, opts)
+    if not S.flag("battle_effectiveness") then return x end
+    local key = effectKey()
+    local numbersX = PP_NUMBERS_X
+    if layoutNow == "emerald" then
+      local Chrome = require("src.ui.game3.battle_chrome")
+      local nx = Chrome.textOrigin(Chrome.WIN.PP_REMAINING)
+      numbersX = tonumber(nx) or numbersX
+    end
+    local okW, w = pcall(FrlgFont.measure, text, opts)
+    w = okW and tonumber(w) or 12
+    local colors = nameColors or (opts and opts.colors)
+    local b = BOX[layoutNow] or BOX.frlg
+    local bx, by = x + b.dx, y + b.dy
+    drawBox(bx, by, colors)
+    if key then
+      local ix = bx + math.floor((BOX_W - iconWidth(key)) / 2)
+      drawIcon(key, ix, by + 2, colors)
+    end
+    return math.max(x, numbersX - w - PP_GAP)
+  end
+
   -- ------- low HP warning
 
   B.LOW_HP = {
@@ -222,28 +382,92 @@ return function(ctx, TypeColors)
       pcall(function() mod.hooks:wrap("battle.low_health_alarm", lowHpAlarm) end)
     end
 
+    RomText = require("src.core.game3.rom_text")
+    local Chrome = require("src.ui.game3.battle_chrome")
+
     -- the move menu is drawn inside Ui.draw while choosing a move
     local origUiDraw = Ui.draw
     Ui.draw = function(...)
-      inMoveDraw = S.flag("battle_move_colors") and (Ui._mode == "moves" or Ui._mode == "target")
-      pendingMove = nil
+      moveMenu = Ui._mode == "moves" or Ui._mode == "target"
+      inMoveDraw = S.flag("battle_move_colors") and moveMenu
+      local okL, l = pcall(Chrome.layout)
+      layoutNow = okL and l or "frlg"
+      pendingMove, lastName, nameColors, arrowAt, rsTypeIcon, rsBox = nil, nil, nil, nil, nil, false
       local ok, err = pcall(origUiDraw, ...)
-      inMoveDraw, pendingMove = false, nil
+      inMoveDraw, moveMenu, pendingMove, lastName, arrowAt, rsTypeIcon = false, false, nil, nil, nil, nil
       if not ok then error(err, 0) end
     end
 
     local origName = Moves.displayName
     Moves.displayName = function(mv, ...)
       local name = origName(mv, ...)
-      if inMoveDraw and type(name) == "string" and name ~= "-------" then
-        local okK, key = pcall(moveKey, mv, name)
-        pendingMove = { text = name, key = okK and key or "NORMAL" }
+      if moveMenu and type(name) == "string" then
+        lastName = name
+        if inMoveDraw and name ~= "-------" then
+          local okK, key = pcall(moveKey, mv, name)
+          pendingMove = { text = name, key = okK and key or "NORMAL" }
+        end
       end
       return name
     end
 
+    -- Ruby/Sapphire: the move menu's box cursor becomes FR/LG/Emerald's arrow
+    -- (drawn with the first move name, in the same colours)
+    local okMC, MenuCursor = pcall(require, "src.ui.game3.rs.menu_cursor")
+    if okMC and type(MenuCursor) == "table" and type(MenuCursor.draw) == "function" then
+      local origCursor = MenuCursor.draw
+      MenuCursor.draw = function(x, y, width, ...)
+        if moveMenu and layoutNow == "rs" and width == 72 then
+          arrowAt = { x, y }
+          return
+        end
+        return origCursor(x, y, width, ...)
+      end
+    end
+    local RS_NAME_SHIFT = 11 -- room for the arrow before each move name
+
     local origFontDraw = FrlgFont.draw
     FrlgFont.draw = function(text, x, y, opts, ...)
+      if moveMenu then
+        -- Ruby/Sapphire move names (and "-"): shift right, arrow in front
+        if layoutNow == "rs" and (x == 8 or x == 88) and (y == 120 or y == 136) then
+          if arrowAt then
+            local a = arrowAt
+            arrowAt = nil
+            pcall(FrlgFont.drawGlyph, FrlgFont.CHAR_SELECTOR_ARROW, a[1], a[2],
+              { colors = (opts and opts.colors) or nil })
+          end
+          x = x + RS_NAME_SHIFT
+        end
+        if lastName ~= nil and text == lastName then
+          lastName = nil
+          nameColors = opts and opts.colors or nameColors
+        end
+        if text == ppLabel() then
+          if layoutNow == "rs" then
+            rsBox = S.flag("battle_effectiveness")
+            rsTypeIcon = rsBox and effectKey() or nil
+          else
+            local okP, nx = pcall(placePp, text, x, y, opts)
+            if okP and tonumber(nx) then x = nx end
+          end
+        elseif rsBox and layoutNow == "rs" and x == 184 and y == 136 then
+          -- Ruby/Sapphire: the TYPE row first, then the box in the bottom-right
+          -- corner (empty for status moves)
+          local key = rsTypeIcon
+          rsTypeIcon, rsBox = nil, false
+          if pendingMove ~= nil and text ~= pendingMove.text then pendingMove = nil end
+          local r = { origFontDraw(text, x, y, opts, ...) }
+          pcall(function()
+            local colors = nameColors or (opts and opts.colors)
+            drawBox(RS_BOX_X, RS_BOX_Y, colors)
+            if key then
+              drawIcon(key, RS_BOX_X + math.floor((BOX_W - iconWidth(key)) / 2), RS_BOX_Y + 2, colors)
+            end
+          end)
+          return (table.unpack or unpack)(r)
+        end
+      end
       if pendingMove ~= nil then
         local p = pendingMove
         pendingMove = nil

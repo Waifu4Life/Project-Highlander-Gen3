@@ -12,7 +12,11 @@ return function(mod)
   local DEFAULTS = {
     start_enabled = true,
     pokebox = true,
-    clock = true,
+    clock = true,          -- old ON/OFF; only read once to carry OFF into clock_mode
+    clock_mode = "rotation", -- "off" | "device" | "play" | "ingame" (Hoenn) | "rotation"
+    start_hidden = "",     -- "KEY,KEY" (START MENU SETTINGS > HIDE ITEMS)
+    start_names = "",
+    start_opt_rows = "",   -- other mods' OPTIONS rows seen so far (Start Menu items)      -- "KEY=NAME|KEY=NAME" (START MENU SETTINGS > CUSTOM RENAME)
     skip_recaps = true,
     box_exclusive = true,
     party_xp = true,
@@ -23,7 +27,7 @@ return function(mod)
     rematch_anyone = true,
     run_everywhere = true,
     sparkling_hidden = true,
-    unlimited_pp = true,
+    unlimited_pp = false, -- Off by default: borderline cheating
     use_repel_again = true,
     borders_enabled = true,
     border_scope = "game", -- "game" | "save"
@@ -31,6 +35,9 @@ return function(mod)
     bag_pouch_kanto = "off",
     bag_pouch_hoenn = "off",
     battle_enemy_hp = true,
+    battle_effectiveness = true,
+    safari_unlimited_balls = true,
+    safari_no_run = true,
     low_hp_warning = "normal", -- "normal" | "reduced" | "off"
     ball_shortcuts = true,
     select_up = 4, -- POKé BALL
@@ -193,10 +200,52 @@ return function(mod)
     end
   end
 
+  -- ------- per-save values (Start Menu order, icons, hidden items, names)
+  -- Kept in the save file. A save without its own order/icons uses the
+  -- shared ones from before 1.81.0; hidden items and names start empty.
+  local function saveGet(key, noShared)
+    local ok, v = pcall(mod.save.get, mod.save, key)
+    if ok and v ~= nil then return v end
+    if noShared then return DEFAULTS[key] end
+    return S.get(key)
+  end
+
+  local function saveSet(key, value)
+    local ok = pcall(mod.save.set, mod.save, key, value)
+    if not ok then S.set(key, value) end
+  end
+
+  function S.orderRaw() return tostring(saveGet("start_order")) end
+
+  -- other mods' rows of the OPTIONS menu that open something (seen there),
+  -- "KEY=LABEL|...": they become Start Menu items
+  function S.rememberOptionRows(list)
+    local parts = {}
+    for _, r in ipairs(list or {}) do
+      local k = tostring(r.key or ""):gsub("[|=]", " ")
+      local l = tostring(r.label or k):gsub("[|=]", " ")
+      if k ~= "" then parts[#parts + 1] = k .. "=" .. l end
+    end
+    local raw = table.concat(parts, "|")
+    if S.get("start_opt_rows") ~= raw then S.set("start_opt_rows", raw) end
+  end
+
+  function S.optionRows()
+    local out = {}
+    local raw = S.get("start_opt_rows")
+    if type(raw) == "string" then
+      for part in raw:gmatch("[^|]+") do
+        local k, l = part:match("^([^=]+)=(.*)$")
+        if k then out[#out + 1] = { key = k, label = l } end
+      end
+    end
+    return out
+  end
+
   -- ------- start menu order (shared by all five games; absent items are skipped)
 
   function S.order()
-    local raw = S.get("start_order")
+    local raw = saveGet("start_order")
     local out, seen = {}, {}
     if type(raw) == "string" then
       for id in raw:gmatch("[^,%s]+") do
@@ -219,11 +268,11 @@ return function(mod)
   end
 
   function S.setOrder(list)
-    S.set("start_order", table.concat(list, ","))
+    saveSet("start_order", table.concat(list, ","))
   end
 
   function S.resetOrder()
-    S.set("start_order", table.concat(S.DEFAULT_ORDER, ","))
+    saveSet("start_order", table.concat(S.DEFAULT_ORDER, ","))
   end
 
   -- ------- custom icons for other mods' Start Menu items (shared by all games)
@@ -255,7 +304,7 @@ return function(mod)
   end
 
   function S.icons()
-    return (parsePairs(S.get("start_icons"), ","))
+    return (parsePairs(saveGet("start_icons"), ","))
   end
 
   -- "auto" when the player has not picked one
@@ -265,7 +314,7 @@ return function(mod)
   end
 
   function S.setIcon(key, value)
-    local map, list = parsePairs(S.get("start_icons"), ",")
+    local map, list = parsePairs(saveGet("start_icons"), ",")
     if value == nil or value == "auto" then
       map[key] = nil
     else
@@ -276,7 +325,7 @@ return function(mod)
     for _, k in ipairs(list) do
       if map[k] then parts[#parts + 1] = k .. "=" .. map[k] end
     end
-    S.set("start_icons", table.concat(parts, ","))
+    saveSet("start_icons", table.concat(parts, ","))
   end
 
   -- other mods' items, remembered so CUSTOM ICONS lists them even before
@@ -303,6 +352,105 @@ return function(mod)
     local parts = {}
     for _, k in ipairs(list) do parts[#parts + 1] = k .. "=" .. map[k] end
     S.set("start_icon_items", table.concat(parts, "|"))
+  end
+
+  -- ------- clock (top bar of the Start Menu)
+
+  S.CLOCKS = {
+    { id = "off", label = "OFF" },
+    { id = "device", label = "DEVICE" },
+    { id = "play", label = "PLAY" },
+    { id = "ingame", label = "IN-GAME", hoenn = true }, -- FireRed/LeafGreen have no clock
+    { id = "rotation", label = "ROTATION" },
+  }
+
+  function S.clockMode(session)
+    local v = S.get("clock_mode")
+    -- an old CLOCK OFF (before 1.79.0) stays OFF
+    if v == "rotation" and S.get("clock") == false then
+      local g = liveGame()
+      local saved = g and bucket(g.options, false)
+      if not (saved and saved.clock_mode ~= nil) then v = "off" end
+    end
+    for _, c in ipairs(S.CLOCKS) do
+      if c.id == v then
+        if c.hoenn and not S.isHoenn(session) then return "device" end
+        return v
+      end
+    end
+    return "rotation"
+  end
+
+  function S.clockLabel(session)
+    local v = S.clockMode(session)
+    for _, c in ipairs(S.CLOCKS) do if c.id == v then return c.label end end
+    return "ROTATION"
+  end
+
+  function S.stepClock(session, dir)
+    local v, at = S.clockMode(session), 1
+    for i, c in ipairs(S.CLOCKS) do if c.id == v then at = i break end end
+    local hoenn = S.isHoenn(session)
+    repeat
+      at = (at - 1 + (dir or 1)) % #S.CLOCKS + 1
+    until hoenn or not S.CLOCKS[at].hoenn
+    S.set("clock_mode", S.CLOCKS[at].id)
+  end
+
+  -- ------- HIDE ITEMS (keys: "mods" and "x:<KEY>" for other mods' items)
+
+  function S.hiddenSet()
+    local out = {}
+    local raw = saveGet("start_hidden", true)
+    if type(raw) == "string" then
+      for key in raw:gmatch("[^,]+") do out[key] = true end
+    end
+    return out
+  end
+
+  function S.isHidden(key)
+    return S.hiddenSet()[key] == true
+  end
+
+  function S.setHidden(key, hide)
+    local set = S.hiddenSet()
+    set[key] = hide and true or nil
+    local list = {}
+    for k in pairs(set) do list[#list + 1] = k end
+    table.sort(list)
+    saveSet("start_hidden", table.concat(list, ","))
+  end
+
+  -- ------- CUSTOM RENAME (keys: built-in ids, "exit", "x:<KEY>")
+
+  function S.names()
+    local map = {}
+    local raw = saveGet("start_names", true)
+    if type(raw) == "string" then
+      for part in raw:gmatch("[^|]+") do
+        local k, v = part:match("^([^=]+)=(.+)$")
+        if k and map[k] == nil then map[k] = v end
+      end
+    end
+    return map
+  end
+
+  function S.nameFor(key)
+    local v = S.names()[key]
+    return (type(v) == "string" and v ~= "") and v or nil
+  end
+
+  -- an empty name (or nil) puts the usual one back
+  function S.setName(key, name)
+    local map = S.names()
+    if type(name) == "string" then name = name:gsub("[|=]", " ") end
+    map[key] = (type(name) == "string" and name ~= "") and name or nil
+    local keys = {}
+    for k in pairs(map) do keys[#keys + 1] = k end
+    table.sort(keys)
+    local parts = {}
+    for _, k in ipairs(keys) do parts[#parts + 1] = k .. "=" .. map[k] end
+    saveSet("start_names", table.concat(parts, "|"))
   end
 
   return S

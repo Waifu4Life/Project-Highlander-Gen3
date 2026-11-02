@@ -23,8 +23,9 @@ return function(ctx)
   local function available(session)
     local set = {}
     for _, id in ipairs(S.DEFAULT_ORDER) do set[id] = true end
-    if not S.flag("pokebox") then set.pokebox = nil end
+    if not S.flag("pokebox") or S.isHidden("pokebox") then set.pokebox = nil end
     if not S.isHoenn(session) then set.pokenav = nil end
+    if S.isHidden("mods") then set.mods = nil end
     return set
   end
 
@@ -55,12 +56,16 @@ return function(ctx)
     local set = available(Sort._session)
     local slotFor = {}
     for id in pairs(set) do
-      slotFor[id] = { id = id, label = id == "trainer" and playerLabel(Sort._session) or L.label(id) }
+      slotFor[id] = { id = id, label = L.tileLabel(id,
+        id == "trainer" and playerLabel(Sort._session) or L.label(id)) }
     end
     local extraKeys = {}
     for _, x in ipairs(extras()) do
-      slotFor[x.key] = x.slot
-      extraKeys[#extraKeys + 1] = x.key
+      if not S.isHidden(x.key) then
+        x.slot.label = L.tileLabel(x.key, x.slot.label)
+        slotFor[x.key] = x.slot
+        extraKeys[#extraKeys + 1] = x.key
+      end
     end
     -- the saved order, plus extras it doesn't know yet (at the end, before EXIT)
     local full, inFull = S.order(), {}
@@ -76,7 +81,7 @@ return function(ctx)
       end
     end
     Sort._full, Sort._visible = full, visible
-    Sort._slots = L.fromList(list, { id = "exit", label = L.label("exit"), fixed = true })
+    Sort._slots = L.fromList(list, { id = "exit", label = L.tileLabel("exit", L.label("exit")), fixed = true })
   end
 
   local function save()

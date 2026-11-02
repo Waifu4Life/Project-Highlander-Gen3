@@ -7,6 +7,36 @@ return function(ctx)
 
   local function onOff(v) return v and "ON" or "OFF" end
 
+  -- Project Highlander's pages have no CANCEL row (B goes back), like Gen 1/2
+  function H.ours(rows)
+    if type(rows) == "table" then rows.ph3NoCancel = true end
+    return rows
+  end
+
+  local function pagesOf(menu)
+    return menu._pages or (type(menu._st) == "table" and menu._st.pages) or nil
+  end
+
+  local function topPage(menu)
+    local pages = pagesOf(menu)
+    return type(pages) == "table" and pages[#pages] or nil, pages
+  end
+
+  -- the cursor never lands on the game's CANCEL row of our pages: going
+  -- down from the last row goes round to the first, up from the first to the last
+  local function skipCancel(menu, p0, before, setCursor)
+    local p = topPage(menu)
+    if not (p and p == p0 and type(p.rows) == "table" and p.rows.ph3NoCancel) then return end
+    local n = #p.rows
+    if n == 0 or (tonumber(p.index) or 1) <= n then return end
+    if before == n then
+      p.index, p.scroll = 1, 0
+    else
+      p.index = n
+    end
+    if setCursor then menu.cursor = p.index end
+  end
+
   -- Values on our pages are drawn right-aligned at the end of the row, so
   -- they line up in one column and never cover the setting's name. Each
   -- value() marks its text; the next font draw of that text is moved.
@@ -31,14 +61,82 @@ return function(ctx)
     }
   end
 
+  -- START MENU SETTINGS > HIDE ITEMS: MODS and other mods' items, A-Z
+  local function hideRows()
+    local rows = {}
+    for _, it in ipairs(ctx.startMenu.hideItems()) do
+      rows[#rows + 1] = {
+        id = "ph3_hide_" .. it.key, label = it.label,
+        value = aligned(function() return S.isHidden(it.key) and "HIDE" or "SHOW" end),
+        step = function()
+          S.setHidden(it.key, not S.isHidden(it.key))
+          return true
+        end,
+      }
+    end
+    return rows
+  end
+
+  -- START MENU SETTINGS > CUSTOM RENAME: every item, A-Z; A opens the
+  -- keyboard (up to 10 characters), an empty name puts the usual one back
+  local function renameRows(session)
+    pcall(ctx.startMenu.syncNames)
+    local rows = {}
+    for _, it in ipairs(ctx.startMenu.renameItems(session)) do
+      rows[#rows + 1] = {
+        id = "ph3_name_" .. it.key, label = it.label,
+        value = aligned(function() return S.nameFor(it.key) or "----" end),
+        activate = function(c)
+          ctx.startMenu.rename(it.key, (c and c.session) or session)
+        end,
+      }
+    end
+    return rows
+  end
+
+  -- Same order as Gen 1/2: ENABLE, CLOCK, THEME (COLOUR), SAVE THEME (COLOUR
+  -- SCOPE), CUSTOM ICONS, CUSTOM RENAME, HIDE ITEMS, SORT MENU. POKéBOX is in
+  -- HIDE ITEMS, like Gen 1/2.
+  local START_ORDER = { "ph3_start_enabled", "ph3_clock", "ph3_theme", "ph3_theme_scope",
+    "ph3_custom_icons", "ph3_custom_rename", "ph3_hide_items", "ph3_sort" }
+  local startMenuRowsRaw
   local function startMenuRows()
+    local byId = {}
+    for _, r in ipairs(startMenuRowsRaw()) do byId[r.id] = r end
+    local out = {}
+    for _, id in ipairs(START_ORDER) do
+      if byId[id] then out[#out + 1] = byId[id] end
+    end
+    return out
+  end
+
+  startMenuRowsRaw = function()
     return {
       toggleRow("start_enabled", "ENABLE", "start_enabled"),
-      toggleRow("clock", "CLOCK", "clock"),
+      {
+        id = "ph3_clock", label = "CLOCK",
+        value = aligned(function(c) return S.clockLabel(c and c.session) end),
+        step = function(c, dir)
+          S.stepClock(c and c.session, dir)
+          return true
+        end,
+      },
       {
         id = "ph3_custom_icons", label = "CUSTOM ICONS", value = function() return "" end,
         activate = function(c)
           ctx.iconScreen.show({ session = c and c.session })
+        end,
+      },
+      {
+        id = "ph3_custom_rename", label = "CUSTOM RENAME", value = function() return "" end,
+        activate = function(c)
+          H.openPage("CUSTOM RENAME", H.ours(renameRows(c and c.session)))
+        end,
+      },
+      {
+        id = "ph3_hide_items", label = "HIDE ITEMS", value = function() return "" end,
+        activate = function()
+          H.openPage("HIDE ITEMS", H.ours(hideRows()))
         end,
       },
       toggleRow("pokebox", "POKéBOX", "pokebox"),
@@ -95,6 +193,7 @@ return function(ctx)
     return {
       toggleRow("always_boosted_exp", "ALWAYS BOOSTED EXP", "always_boosted_exp"),
       toggleRow("battle_move_colors", "COLORED MOVE NAMES", "battle_move_colors"),
+      toggleRow("battle_effectiveness", "DISPLAY EFFECTIVENESS", "battle_effectiveness"),
       toggleRow("battle_enemy_hp", "DISPLAY ENEMY HP", "battle_enemy_hp"),
       {
         id = "ph3_low_hp_warning", label = "LOW HP WARNING",
@@ -111,11 +210,19 @@ return function(ctx)
 
   local function overworldScreenRows()
     return {
-      toggleRow("infinite_safari", "INFINITE SAFARI STEPS", "infinite_safari"),
       toggleRow("rematch_anyone", "REMATCH ANYONE, ANYTIME", "rematch_anyone"),
       toggleRow("run_everywhere", "RUN EVERYWHERE", "run_everywhere"),
       toggleRow("sparkling_hidden", "SPARKLING HIDDEN ITEMS", "sparkling_hidden"),
       toggleRow("use_repel_again", "USE REPEL AGAIN?", "use_repel_again"),
+    }
+  end
+
+  -- Alphabetical (Kanto and Hoenn Safari Zones).
+  local function safariRows()
+    return {
+      toggleRow("infinite_safari", "INFINITE SAFARI STEPS", "infinite_safari"),
+      toggleRow("safari_no_run", "NO RUNNING AWAY", "safari_no_run"),
+      toggleRow("safari_unlimited_balls", "UNLIMITED BALLS", "safari_unlimited_balls"),
     }
   end
 
@@ -379,10 +486,25 @@ return function(ctx)
     for _, song in ipairs(JB.list()) do
       rows[#rows + 1] = {
         id = "ph3_jb_" .. song.name, label = song.label,
-        value = aligned(function() return onOff(JB.isOn(song.name)) end),
+        value = aligned(function()
+          if JB.previewing() == song.name then return "PLAY" end
+          return onOff(JB.isOn(song.name))
+        end),
         step = function()
           JB.toggle(song.name)
           return true
+        end,
+        -- SELECT: play this song until SELECT again or the page is left
+        onSelect = function(menu, pg)
+          JB.preview(song, function()
+            if type(menu) ~= "table" then return false end
+            if type(menu.isOpen) == "function" then
+              local okO, open = pcall(menu.isOpen)
+              if okO and not open then return false end
+            end
+            local pages = menu._pages or (type(menu._st) == "table" and menu._st.pages) or nil
+            return type(pages) == "table" and pages[#pages] == pg
+          end)
         end,
       }
     end
@@ -393,35 +515,48 @@ return function(ctx)
     local function page(id, label, build)
       return {
         id = "ph3_" .. id, label = label, value = function() return "" end,
-        activate = function() openPage(label, build()) end,
+        activate = function() openPage(label, H.ours(build())) end,
       }
     end
-    -- Alphabetical
-    local rows = {
-      page("anim_sprites", "ANIMATED SPRITES", animRows),
-      page("battle_screen", "BATTLE SCREEN", battleScreenRows),
-      page("borders", "CUSTOM BORDERS", borderRows),
-      -- FireRed / LeafGreen only
-      -- Ruby / Sapphire / Emerald only
-      S.isHoenn() and page("hoenn_all", "FILL HOENN REGIONAL DEX", hoennRows) or false,
-      not S.isHoenn() and page("kanto_all", "FILL KANTO REGIONAL DEX", kantoRows) or false,
-      page("full_control", "FULL CONTROL", fullControlRows),
-      page("game_corner", "GAME CORNER CHEATS", gameCornerRows),
-      page("johto_helper", "JOHTO POKéMON HELPER", johtoRows),
-      page("jukebox", "JUKEBOX", jukeboxRows),
-      page("other_system", "OTHER SYSTEM SETTINGS", otherSystemRows),
-      page("overworld_screen", "OVERWORLD SCREEN", overworldScreenRows),
-      page("pokemoves", "POKéMOVES", pokemovesRows),
-      page("rumble", "RUMBLE SETTINGS", rumbleRows),
-      page("shortcuts", "SHORTCUTS SETTINGS", shortcutRows),
-      page("start_menu", "START MENU SETTINGS", startMenuRows),
-    }
-    -- rows that don't apply to this game are false: drop them
-    local out = {}
-    for i = 1, #rows + 16 do
-      if rows[i] then out[#out + 1] = rows[i] end
+    -- Three categories, each with its pages in a set order (like Gen 1/2)
+    local function category(id, label, entries)
+      return {
+        id = "ph3_" .. id, label = label, value = function() return "" end,
+        activate = function()
+          local out = {}
+          for i = 1, #entries + 4 do
+            if entries[i] then out[#out + 1] = entries[i] end
+          end
+          openPage(label, H.ours(out))
+        end,
+      }
     end
-    return out
+    local hoenn = S.isHoenn()
+    return {
+      category("cat_mechanics", "MECHANICS", {
+        page("battle_screen", "BATTLE SCREEN", battleScreenRows),
+        page("overworld_screen", "OVERWORLD SCREEN", overworldScreenRows),
+        page("pokemoves", "POKéMOVES", pokemovesRows),
+        page("shortcuts", "SHORTCUTS SETTINGS", shortcutRows),
+        page("game_corner", "GAME CORNER CHEATS", gameCornerRows),
+        page("safari_zone", "SAFARI ZONE CHEATS", safariRows),
+      }),
+      category("cat_system", "SYSTEM", {
+        page("start_menu", "START MENU SETTINGS", startMenuRows),
+        page("other_system", "OTHER SYSTEM SETTINGS", otherSystemRows),
+        page("full_control", "FULL CONTROL", fullControlRows),
+        page("rumble", "RUMBLE SETTINGS", rumbleRows),
+        -- Ruby / Sapphire / Emerald: Hoenn's dex in the same place
+        hoenn and page("hoenn_all", "FILL HOENN REGIONAL DEX", hoennRows)
+          or page("kanto_all", "FILL KANTO REGIONAL DEX", kantoRows),
+        page("johto_helper", "JOHTO POKéMON HELPER", johtoRows),
+      }),
+      category("cat_cosmetics", "COSMETICS", {
+        page("jukebox", "JUKEBOX", jukeboxRows),
+        page("borders", "CUSTOM BORDERS", borderRows),
+        page("anim_sprites", "ANIMATED SPRITES", animRows),
+      }),
+    }
   end
 
   -- SELECT on one of our rows that has onSelect (the option menus themselves
@@ -432,7 +567,7 @@ return function(ctx)
     local p = type(pages) == "table" and pages[#pages] or nil
     local row = p and type(p.rows) == "table" and p.rows[p.index] or nil
     if type(row) == "table" and type(row.onSelect) == "function" then
-      row.onSelect()
+      row.onSelect(menu, p)
       return true
     end
     return false
@@ -443,6 +578,8 @@ return function(ctx)
     if not (ok and type(menu) == "table" and type(menu.handleInput) == "function") then return end
     if menu._ph3Select then return end
     menu._ph3Select = true
+    -- Ruby/Sapphire keep Menu.cursor on the top page; the others on the open page
+    local setCursor = name ~= "src.ui.game3.rs.option_menu"
     local orig = menu.handleInput
     menu.handleInput = function(input, ...)
       if input and input.wasPressed then
@@ -452,8 +589,38 @@ return function(ctx)
           if okS and used then return end
         end
       end
-      return orig(input, ...)
+      local p0 = topPage(menu)
+      local before = p0 and p0.index
+      local r = { orig(input, ...) }
+      pcall(skipCancel, menu, p0, before, setCursor)
+      return (table.unpack or unpack)(r)
     end
+    -- and the CANCEL row isn't drawn on our pages
+    if type(menu.draw) == "function" then
+      local origDraw = menu.draw
+      menu.draw = function(...)
+        local okT, p = pcall(topPage, menu)
+        H.drawingOurs = okT and type(p) == "table" and type(p.rows) == "table" and p.rows.ph3NoCancel == true
+        local okD, err = pcall(origDraw, ...)
+        H.drawingOurs = false
+        if not okD then error(err, 0) end
+      end
+    end
+  end
+
+  local cancelTexts = nil
+  local function isCancel(text)
+    if not cancelTexts then
+      cancelTexts = { CANCEL = true, Cancel = true }
+      local okR, RomText = pcall(require, "src.core.game3.rom_text")
+      if okR then
+        for _, k in ipairs({ "gText_OptionMenuCancel", "gText_Cancel", "gText_Cancel2" }) do
+          local okT, t = pcall(RomText.plain, k)
+          if okT and type(t) == "string" and t ~= "" then cancelTexts[t] = true end
+        end
+      end
+    end
+    return cancelTexts[text] == true
   end
 
   function H.install()
@@ -466,6 +633,7 @@ return function(ctx)
     local FrlgFont = require("src.ui.game3.frlg_font")
     local origDraw = FrlgFont.draw
     FrlgFont.draw = function(text, x, y, opts, ...)
+      if H.drawingOurs and type(text) == "string" and isCancel(text) then return 0 end
       local pending = H.pending
       if pending ~= nil then
         H.pending = nil
@@ -487,10 +655,27 @@ return function(ctx)
         rows = kept
       end
       local view = origGroup(rows, openPage, ...)
+      pcall(function()
+        if type(view) ~= "table" then return end
+        local native = {}
+        for _, id in ipairs(Rows.ORDER or {}) do native[id] = true end
+        local seen = {}
+        for _, row in ipairs(view) do
+          if type(row) == "table" and type(row.activate) == "function" and not row.group
+              and not (row.id ~= nil and native[row.id]) and row.id ~= "ph3_hub" then
+            local key = ctx.startMenu.rowKey(row)
+            if key then seen[#seen + 1] = { key = key, label = tostring(row.label or key) } end
+          end
+        end
+        S.rememberOptionRows(seen)
+      end)
       if type(view) == "table" and type(openPage) == "function" then
         view[#view + 1] = {
           id = "ph3_hub", label = "PROJECT HIGHLANDER", value = function() return "" end,
-          activate = function() openPage("PROJECT HIGHLANDER", hubRows(openPage)) end,
+          activate = function()
+            H.openPage = openPage
+            openPage("PROJECT HIGHLANDER", H.ours(hubRows(openPage)))
+          end,
         }
       end
       return view

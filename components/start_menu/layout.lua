@@ -44,6 +44,11 @@ return function(ctx)
     return L.LABELS[id] or fallback or tostring(id):upper()
   end
 
+  -- the name a tile shows: CUSTOM RENAME's, else the usual one
+  function L.tileLabel(key, fallback)
+    return ctx.settings.nameFor(key) or fallback
+  end
+
   -- Build the slots from the menu's live entries in the saved order (built-in
   -- items and other mods' items alike); items the order doesn't mention yet
   -- follow in the game's order, then EXIT on the bottom-right tile of the
@@ -57,18 +62,24 @@ return function(ctx)
         if e.id == "exit" then
           exitEntry, exitIndex = e, index
         elseif e.id and S.KNOWN[e.id] and not byKey[e.id] then
-          local slot = { id = e.id, entry = e, index = index, label = L.label(e.id, e.label) }
-          byKey[e.id] = slot
-          native[#native + 1] = e.id
+          -- HIDE ITEMS: only MODS among the built-in items can be hidden
+          if not (e.id == "mods" and S.isHidden("mods")) then
+            local slot = { id = e.id, entry = e, index = index,
+              label = L.tileLabel(e.id, L.label(e.id, e.label)) }
+            byKey[e.id] = slot
+            native[#native + 1] = e.id
+          end
         else
           local iconKey = S.iconKey(e)
           keyCount[iconKey] = (keyCount[iconKey] or 0) + 1
           if keyCount[iconKey] > 1 then iconKey = iconKey .. "_" .. keyCount[iconKey] end
           local key = S.extraKey(iconKey)
-          byKey[key] = { id = e.id or "extra", entry = e, index = index,
-            label = tostring(e.label or e.id or "?"), extra = true, iconKey = iconKey,
-            orderKey = key }
-          native[#native + 1] = key
+          if not S.isHidden(key) then
+            byKey[key] = { id = e.id or "extra", entry = e, index = index,
+              label = L.tileLabel(key, tostring(e.label or e.id or "?")), extra = true,
+              iconKey = iconKey, orderKey = key }
+            native[#native + 1] = key
+          end
         end
       end
     end
@@ -89,7 +100,8 @@ return function(ctx)
     local total = math.max(1, math.ceil((#list + 1) / L.PAGE)) * L.PAGE
     local out = { total = total }
     for i = 1, total - 1 do out[i] = list[i] or false end
-    out[total] = { id = "exit", entry = exitEntry, index = exitIndex, label = L.label("exit") }
+    out[total] = { id = "exit", entry = exitEntry, index = exitIndex,
+      label = L.tileLabel("exit", L.label("exit")) }
     return out
   end
 

@@ -105,6 +105,7 @@ return function(ctx)
     local choice = S.iconFor(key)
     if choice ~= "auto" and D.hasIcon(choice) then return choice end
     local e = type(slot.entry) == "table" and slot.entry or {}
+    if type(e.id) == "string" and e.id:sub(1, 4) == "opt:" and D.hasIcon("option") then return "option" end
     return D.autoIcon(tostring(e.id or "") .. " " .. tostring(slot.label or e.label or "") .. " " .. tostring(key))
   end
 
@@ -137,11 +138,37 @@ return function(ctx)
     return ok and text or nil
   end
 
-  -- FireRed/LeafGreen: device clock. Hoenn: alternates device / in-game every 5s.
+  local function playClock(session)
+    local t = type(session) == "table" and (session.playtime or session.playTime) or nil
+    if type(t) ~= "table" then
+      local ok, Runtime = pcall(require, "src.core.game3.runtime")
+      local g = ok and type(Runtime) == "table" and Runtime._game or nil
+      local save = g and g.save
+      t = type(save) == "table" and (save.playTime or save.playtime) or nil
+    end
+    if type(t) ~= "table" then return nil end
+    return string.format("Play Time  %d:%02d", math.max(0, math.floor(tonumber(t.hours) or 0)),
+      math.max(0, math.floor(tonumber(t.minutes) or 0)) % 60)
+  end
+
+  -- START MENU SETTINGS > CLOCK: OFF / DEVICE / PLAY / IN-GAME (Hoenn) /
+  -- ROTATION (each one for 5 seconds in turn). nil = OFF.
+  local ROTATE_EVERY = 5
   function D.clockText(session)
-    if S.isHoenn(session) and math.floor(now() / 5) % 2 == 1 then
+    local mode = S.clockMode(session)
+    if mode == "off" then return nil end
+    if mode == "rotation" then
+      local list = { "device", "play" }
+      if S.isHoenn(session) then list[3] = "ingame" end
+      mode = list[math.floor(now() / ROTATE_EVERY) % #list + 1]
+    end
+    if mode == "ingame" then
       local g = gameClock(session)
       if g then return g end
+      return deviceClock()
+    end
+    if mode == "play" then
+      return playClock(session) or deviceClock()
     end
     return deviceClock()
   end

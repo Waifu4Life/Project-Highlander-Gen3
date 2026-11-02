@@ -1,5 +1,77 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.84.0
+- START MENU (Ruby/Sapphire): a shortcut to an OPTIONS page (HIGHLANDER, other mods' pages) opens
+  that page right away; the game's OPTIONS menu no longer flashes on screen first.
+
+## 1.83.0
+- BATTLE SCREEN > DISPLAY EFFECTIVENESS (Ruby/Sapphire): the box moved 2 more pixels to the right.
+
+## 1.82.0
+- BATTLE SCREEN > DISPLAY EFFECTIVENESS (Ruby/Sapphire): the box now sits flush in the bottom-right
+  corner of the PP panel (2 pixels right, 4 down), clear of the move's type.
+
+## 1.81.0
+- START MENU: the items' order, custom icons, hidden items and names are now kept per save (in the
+  save file), like Gen1+2, so each save (and each game) has its own. A save without its own order
+  or icons starts from the ones you had before; hidden items and names start empty.
+- START MENU: other mods' OPTIONS pages are now found however the mod adds its row (Wilds of
+  Hoenn's included): every row of the OPTIONS menu that opens something is remembered when OPTIONS
+  is shown, and stays a Start Menu item from then on.
+- START MENU SETTINGS: same order as Gen1+2: ENABLE, CLOCK, THEME, SAVE THEME, CUSTOM ICONS,
+  CUSTOM RENAME, HIDE ITEMS, SORT MENU. POKéBOX moved into HIDE ITEMS (per save), like Gen1+2.
+- PROJECT HIGHLANDER pages no longer have a CANCEL row: B goes back, and the cursor goes round from
+  the last row to the first, like Gen1+2.
+- BATTLE SCREEN > DISPLAY EFFECTIVENESS: PP sits 2 pixels further right (FireRed/LeafGreen/
+  Emerald), off the box. Ruby/Sapphire now have the same box, in the bottom-right corner of the
+  PP panel (empty for status moves).
+
+## 1.80.0
+- JUKEBOX: SELECT on a song plays it right away (its row shows PLAY), until SELECT is pressed on
+  it again or you leave the JUKEBOX sub-menu; SELECT on another song switches to it. Then the
+  music from before comes back (or the Jukebox song, if the playlist is playing). Same as Gen1+2.
+- START MENU: every row another mod adds to the OPTIONS menu that opens a page, and PROJECT
+  HIGHLANDER itself (as HIGHLANDER), is now a Start Menu item, like Gen1+2. It opens OPTIONS
+  straight on that page, and backing out of it goes back to the Start Menu. They show until
+  hidden and can be sorted, hidden, renamed and given an icon (the OPTIONS icon by default).
+- BATTLE SCREEN > DISPLAY EFFECTIVENESS (FireRed/LeafGreen/Emerald): the icon now sits in a small
+  box in the top-left corner of the PP panel, with PP next to its numbers, so it no longer reads
+  like "2x PP". Status moves get the same box, left empty. Ruby/Sapphire are unchanged (end of the
+  TYPE row).
+- PARTY > RENAME: a name left blank now goes back to the species name, like the games do.
+- SAFARI ZONE is now SAFARI ZONE CHEATS.
+
+## 1.79.0
+- PROJECT HIGHLANDER is now split in three categories, like Project Highlander Gen1+2:
+  - MECHANICS: Battle Screen, Overworld Screen, PokéMoves, Shortcuts Settings, Game Corner Cheats,
+    Safari Zone.
+  - SYSTEM: Start Menu Settings, Other System Settings, Full Control, Rumble Settings, Fill Kanto
+    Regional Dex (Fill Hoenn Regional Dex in Ruby/Sapphire/Emerald), Johto Pokémon Helper.
+  - COSMETICS: Jukebox, Custom Borders, Animated Sprites.
+- New SAFARI ZONE page (Kanto and Hoenn): INFINITE SAFARI STEPS (moved from Overworld Screen),
+  NO RUNNING AWAY (wild Pokémon never flee; Bait, Rocks, Pokéblocks and Go Near still change the
+  catch odds) and UNLIMITED BALLS (a thrown Safari Ball is given back, so the count never drops).
+  Both new rows are On by default.
+- START MENU SETTINGS:
+  - CLOCK is now OFF / DEVICE / PLAY / IN-GAME / ROTATION. PLAY is the play time; IN-GAME (the
+    game's own clock) is in Ruby/Sapphire/Emerald only; ROTATION shows each in turn every 5
+    seconds (the default). A clock you had turned Off stays Off.
+  - New HIDE ITEMS: MODS and other mods' items can be hidden from the Start Menu (and the Sort Menu).
+  - New CUSTOM RENAME: every Start Menu item can be renamed with the game's keyboard, up to 10
+    characters; an empty name puts the usual one back. Decapitalize leaves these names as typed.
+  - Hidden items and names are shared by all five games, like the order and the custom icons.
+- PARTY: new RENAME in the A menu (after RELEARN), for any Pokémon but an Egg. It opens the same
+  nickname screen as the Name Rater; an empty name keeps the old one.
+- BATTLE SCREEN: new DISPLAY EFFECTIVENESS (On by default): 0x / ½x / 1x / 2x for the selected
+  move against the foe (the one you target in double battles), damaging moves only; ¼x shows as
+  ½x and 4x as 2x, with the same icons as Gen1+2. FireRed/LeafGreen/Emerald: in PP's place, with
+  PP moved against its numbers. Ruby/Sapphire: at the end of the TYPE row (narrower panel).
+- BATTLE SCREEN: UNLIMITED PP is now Off by default (borderline cheating). If you had turned it
+  On yourself, it stays On.
+- Ruby/Sapphire: the move menu in battle has the ▶ arrow of FireRed/LeafGreen/Emerald instead of
+  Ruby's box cursor, which clashed with Colored Move Names. The move names sit a little to the
+  right to make room for it.
+
 ## 1.78.0
 - START MENU / SORT MENU / CUSTOM ICONS: the small text at the top right (page number, button
   hints) sits higher, lined up with the clock / title on the left instead of touching the bar's

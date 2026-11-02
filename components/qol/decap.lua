@@ -87,8 +87,12 @@ return function(ctx)
   end
 
   local cache, cacheSize = {}, 0
+  -- texts drawn exactly as typed (Start Menu CUSTOM RENAME names)
+  D.keep = {}
+
   function D.apply(text)
     if type(text) ~= "string" or text == "" or not on() then return text end
+    if D.keep[text] then return text end
     local hit = cache[text]
     if hit == nil then
       local ok, r = pcall(recase, text)

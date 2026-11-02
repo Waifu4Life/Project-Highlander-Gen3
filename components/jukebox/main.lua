@@ -342,7 +342,10 @@ return function(ctx)
   end
 
   -- the Jukebox song to play instead of id, or nil
+  local preview = nil -- { name, id, before, watch } while a song is previewed
+
   local function swap(A, id)
+    if preview then return nil end
     if not (J.active and J.song) then return nil end
     local ok, r = pcall(A.resolveSong, id)
     r = ok and r or id
@@ -352,6 +355,46 @@ return function(ctx)
 
   local function current(A)
     return A._currentSong and A._currentSong.id or nil
+  end
+
+  -- ------------------------------------------------------------- preview
+  -- SELECT on a song in the JUKEBOX sub-menu plays it right away (its row
+  -- shows PLAY) until SELECT is pressed on it again or the sub-menu is left;
+  -- SELECT on another song switches to it. Then the music from before comes
+  -- back (or the Jukebox song, if the playlist is playing).
+
+  function J.previewing() return preview and preview.name or nil end
+
+  function J.stopPreview()
+    if not preview then return end
+    local before = preview.before
+    preview = nil
+    local A = Audio()
+    if not A then return end
+    local id = (J.active and J.song) or before or areaSong()
+    if id then pcall(A.fadeOutAndPlay, id, 4) end
+  end
+
+  -- watch(): true while the JUKEBOX sub-menu is still the page on screen
+  function J.preview(song, watch)
+    local A = Audio()
+    if not (A and type(song) == "table") then return end
+    if preview and preview.name == song.name then return J.stopPreview() end
+    local id = song.id
+    if id == nil then
+      local ok, songs = pcall(songTable)
+      id = ok and type(songs) == "table" and songs[song.name] or nil
+    end
+    if id == nil then return end
+    if not preview then preview = { before = current(A) } end
+    preview.name, preview.id, preview.watch = song.name, id, watch
+    pcall(A.fadeOutAndPlay, id, 4)
+  end
+
+  local function previewWatch()
+    if not preview then return end
+    local ok, still = pcall(preview.watch or function() return false end)
+    if not (ok and still) then J.stopPreview() end
   end
 
   function J.install()
@@ -416,6 +459,7 @@ return function(ctx)
       local origUi = UiPass.drawUi
       UiPass.drawUi = function(...)
         local r = { origUi(...) }
+        if preview then pcall(previewWatch) end
         if note then pcall(drawNote) end
         return (table.unpack or unpack)(r)
       end
