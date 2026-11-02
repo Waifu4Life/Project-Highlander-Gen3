@@ -12,7 +12,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 > [!NOTE]
 > Project Highlander Gen3 only runs in the five Gen 3 games. For Red / Blue / Yellow / Gold / Silver / Crystal, use [Project Highlander](https://github.com/Waifu4Life/Project-Highlander-A-Modern-UI-Suite-Fork), a separate mod.
 
-**Current release:** 1.78.0 (BETA)
+**Current release:** 1.84.0 (BETA)
 **Requires:** G1R Deluxe 0.3.89 or newer (built against 0.3.97)
 
 ---
@@ -39,6 +39,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 - [Shortcuts Settings](#shortcuts-settings)
 - [Custom Borders](#custom-borders)
 - [Game Corner Cheats](#game-corner-cheats)
+- [Safari Zone Cheats](#safari-zone-cheats)
 - [Fill Kanto Regional Dex](#fill-kanto-regional-dex)
 - [Fill Hoenn Regional Dex](#fill-hoenn-regional-dex)
 - [Johto Pokémon Helper](#johto-pokémon-helper)
@@ -54,6 +55,7 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Setting | Default |
 |---|---|
 | Bag on Specific Pouch | Off |
+| Clock | Rotation |
 | Low HP Warning | Normal |
 | Loop Animations | Medium |
 | Rumble Intensity | Medium |
@@ -61,6 +63,7 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Screen Ratio | 16:9 |
 | Ball Shortcuts | Up: Poké Ball, Down: Ultra Ball, Left: Great Ball, Right: None |
 | Jukebox Button | None (set it in Full Control) |
+| Unlimited PP | Off (borderline cheating) |
 
 Rows that don't concern the game you're playing are hidden (FireRed / LeafGreen-only rows don't show in Hoenn, Ruby / Sapphire-only rows don't show in Emerald, and so on).
 
@@ -89,7 +92,9 @@ These run whenever the matching screen or event is in play. There is no toggle.
 | Area | What you get |
 |---|---|
 | Party | **Select** quick switch: Select on a Pokémon, then A or Select on another swaps them, B cancels. |
-| Party A-menu | Always in this order: Summary, Role, Switch, Item, Relearn, HM moves, TM moves, Cancel. Works with Wilds of Hoenn's Role row. More than 8 entries scroll with a scroll bar. |
+| Party A-menu | Always in this order: Summary, Role, Switch, Item, Relearn, Rename, HM moves, TM moves, Cancel. Works with Wilds of Hoenn's Role row. More than 8 entries scroll with a scroll bar. |
+| Party | **Rename** any Pokémon (not Eggs) with the Name Rater's screen. Left blank, it goes back to the species name. |
+| Battle | **Ruby / Sapphire:** the move menu has FireRed / LeafGreen / Emerald's ▶ arrow instead of Ruby's box cursor. |
 | Bag | 255-item limit with an **Items x/255** counter (red when full). In FireRed / LeafGreen the TM Case and Berry Pouch count as one item each. |
 | Bag | **Start** opens a Sort By menu. **Select** opens the TM Case (FireRed / LeafGreen, outside battle). |
 | PC | **Select** toggles Auto-Grab. **Multiple** in the A-menu moves a group between boxes or in and out of the party. |
@@ -102,6 +107,14 @@ These run whenever the matching screen or event is in play. There is no toggle.
 ---
 
 ## Hub layout
+
+The hub is split into three categories, like Project Highlander Gen1+2, each with its sub-menus in a set order:
+
+| Category | Sub-menus |
+|---|---|
+| **MECHANICS** | Battle Screen, Overworld Screen, PokéMoves, Shortcuts Settings, Game Corner Cheats, Safari Zone Cheats |
+| **SYSTEM** | Start Menu Settings, Other System Settings, Full Control, Rumble Settings, Fill Kanto Regional Dex *(FireRed / LeafGreen)* or Fill Hoenn Regional Dex *(Ruby / Sapphire / Emerald)*, Johto Pokémon Helper |
+| **COSMETICS** | Jukebox, Custom Borders, Animated Sprites |
 
 | Sub-menu | What it covers |
 |---|---|
@@ -118,10 +131,11 @@ These run whenever the matching screen or event is in play. There is no toggle.
 | Overworld Screen | Travel and exploration options. |
 | PokéMoves | HM / TM / relearn tools. |
 | Rumble Settings | Controller rumble. |
+| Safari Zone Cheats | Kanto and Hoenn Safari Zones without limits. |
 | Shortcuts Settings | Ball shortcuts in battle and Key Item shortcuts on Select. |
 | Start Menu Settings | Modern Start Menu. Has its own **Enable** switch. |
 
-The hub is alphabetical. Inside a sub-menu, **Enable** is on top and the rest is alphabetical, except where a fixed order makes more sense (controller order for buttons, the Regional Dex pages). Option values are right-aligned at the end of each row.
+Inside a sub-menu, **Enable** is on top and the rest is alphabetical, except where a fixed order makes more sense (controller order for buttons, the Regional Dex pages, Start Menu Settings). Option values are right-aligned at the end of each row. Project Highlander's pages have no Cancel row: **B** goes back, and the cursor goes round from the last row to the first.
 
 ---
 
@@ -131,40 +145,49 @@ A two-column, five-row Start Menu with flat coloured icon buttons.
 
 - **FireRed / LeafGreen:** Pokédex, Pokémon, Bag, PokéBox, Trainer, Save, Options, Mods, Exit.
 - **Ruby / Sapphire / Emerald:** the same, plus PokéNav.
-- **Items from other mods** (a DexNav entry, for example) get their own tiles. With more than nine items besides Exit, the menu gets a 2nd page (or more): Up / Down go from page to page and wrap round, Left / Right switch column, and the page (e.g. 1/2) shows at the top right.
+- **Items from other mods** (a DexNav entry, for example) get their own tiles.
+- **Options pages as items:** every page another mod adds to the Options menu (Wilds of Hoenn's, for example), and PROJECT HIGHLANDER itself (as **Highlander**), is a Start Menu item too. It opens that page straight away, and backing out of it returns to the Start Menu. A mod's page shows up once Options has been opened with that mod running. With more than nine items besides Exit, the menu gets a 2nd page (or more): Up / Down go from page to page and wrap round, Left / Right switch column, and the page (e.g. 1/2) shows at the top right.
 - **Exit** always stays bottom-right of the last page.
 - **Save** stays in the Start Menu: the save prompts appear on top of it and you're back on Save afterwards.
 - **Select** on the Start Menu opens the Sort Menu.
 
+Same order as Project Highlander Gen1+2:
+
 | Option | Values |
 |---|---|
 | Enable | On / Off |
-| Clock | Day, date and device time bar (Hoenn alternates with the in-game clock). |
-| Custom Icons | Pick the icon of each item other mods add to the Start Menu (see below). |
-| PokéBox | Bill's PC "Move Pokémon" from anywhere; leaving it returns to the Start Menu. |
-| Save Theme | **Per Game** or Per Save |
-| Sort Menu | Arrange the Start Menu items (see below). |
+| Clock | Off / Device (day, date and time) / Play (play time) / In-Game (**Ruby / Sapphire / Emerald only**) / **Rotation** (each in turn, every 5 seconds) |
 | Theme | **Auto** (follows the game), FireRed, LeafGreen, Ruby, Sapphire, Emerald |
+| Save Theme | **Per Game** or Per Save |
+| Custom Icons | Pick the icon of each item other mods add to the Start Menu (see below). |
+| Custom Rename | Rename any Start Menu item, Exit included, up to 10 characters with the game's keyboard. An empty name puts the usual one back. Decapitalize Words leaves these names as typed. |
+| Hide Items | Show / hide **PokéBox**, **Mods** and other mods' items (Options pages included). |
+| Sort Menu | Arrange the Start Menu items (see below). |
+
+**PokéBox** opens Bill's PC "Move Pokémon" from anywhere; leaving it returns to the Start Menu.
+
+The order, custom icons, hidden items and names are **kept per save**, so each save (and each game) has its own.
 
 **Sort Menu** (Select on the Start Menu, or Start Menu Settings → Sort Menu)
 
 - A picks an item up, A on another item swaps the two. B drops it, or leaves when nothing is held.
 - **Select** resets to the default order, with other mods' items after the built-in ones.
 - Other mods' items move like the built-in ones. Exit stays bottom-right of the last page.
-- One order is shared by all five games; items a game doesn't have are skipped.
+- The order is kept per save; items a game doesn't have are skipped. Hidden items aren't listed.
 
 **Custom Icons**
 
 - Lists the items other mods add to the Start Menu. They're remembered once seen, so they stay listed even when they're not in the menu right now.
 - A opens a picker of 32 coloured icons: the Start Menu's own, plus Menu, Link, Quest, Map, Music, Camera, Trophy, Heart, Star, Tools, Key, Clock, Mail, Chat, Home, Shop, Chest, Battle, Potion, Bike, Craft and Search. A dot marks the icon in use.
-- **Auto** (default) picks an icon from the item's name (Jukebox / Music → Music, Map → Map…), otherwise the Mods icon. **Select** on an item puts it back to Auto.
-- Shared by all five games.
+- **Auto** (default) picks an icon from the item's name (Jukebox / Music → Music, Map → Map…), otherwise the Mods icon; Options pages get the Options icon. **Select** on an item puts it back to Auto.
+- Kept per save.
 
 ## Party
 
 - **Select** quick switch and the fixed A-menu order (see [Always on](#always-on)).
 - **Display XP in Party Menu** (Other System Settings): an XP bar in every box; the first Pokémon's box is taller and shows its XP numbers.
 - **Relearn** appears in the A-menu when Move Relearning is on and there's something to relearn.
+- **Rename** (after Relearn) for any Pokémon but an Egg, with the Name Rater's screen. Left blank, it goes back to the species name.
 
 ## Bag
 
@@ -199,16 +222,16 @@ A two-column, five-row Start Menu with flat coloured icon buttons.
 |---|---|
 | Always Boosted EXP | Every Pokémon gets the traded-Pokémon EXP bonus. Your Trainer ID is untouched and nothing starts disobeying. |
 | Colored Move Names | A frame in each move's type colour. |
+| Display Effectiveness | 0x / ½x / 1x / 2x for the selected move against the foe (the one you target in double battles), in a small box in the PP panel: top-left corner in FireRed / LeafGreen / Emerald (with PP moved next to its numbers), bottom-right corner in Ruby / Sapphire. Damaging moves only (the box stays empty for status moves); ¼x shows as ½x and 4x as 2x. |
 | Display Enemy HP | The enemy's HP in numbers. |
 | Low HP Warning | **Normal** (the game's looping beep) / Reduced (a few beeps when the bar turns red) / Off |
 | Modern EXP Sharing | Every other living party Pokémon gets half a battler's share, with one "The others gained…" line. |
-| Unlimited PP | Your moves never lose PP. Not in link battles. |
+| Unlimited PP | **Off** by default. Your moves never lose PP. Not in link battles. |
 
 ## Overworld Screen
 
 | Option | What it does |
 |---|---|
-| Infinite Safari Steps | The Kanto and Hoenn Safari Zone steps never run out. The game ends when you're out of Safari Balls or you leave. |
 | Rematch Anyone, Anytime | Talk to a beaten trainer for a rematch. Their team is set to your lowest Pokémon's level, evolved, with level-up moves. Gym Leaders included (no second badge or TM). |
 | Run Everywhere | Run inside buildings in Ruby / Sapphire / Emerald. |
 | Sparkling Hidden Items | A pulsing sparkle marks every hidden item you haven't found yet. |
@@ -297,6 +320,8 @@ Set a **Jukebox Button** in [Full Control](#full-control), then in the overworld
 - A short note at the top left shows the song's name, in your Start Menu theme's colours.
 - Needs **Full Control → Enable** On. In menus, battles and the naming screen the button does what it did before.
 
+To listen to a song, press **Select** on it in the Jukebox sub-menu: it plays right away (the row shows PLAY) until you press Select on it again or leave the sub-menu. Select on another song switches to it. Then the music from before comes back.
+
 ## Shortcuts Settings
 
 - **Ball Shortcuts:** Select + a D-pad direction throws a ball in a wild battle. Up to 4 can be set (Poké, Great, Ultra, Net, Dive, Nest, Repeat, Timer, Luxury, Premier — no Master or Safari Ball). Not in the Safari Zone, against trainers, or in link, double, Frontier / Pyramid or scripted battles. A red note shows when it's active.
@@ -327,6 +352,16 @@ Celadon (FireRed / LeafGreen) and Mauville (Ruby / Sapphire / Emerald).
 | All Lucky Machines | Every machine plays like the luckiest one. |
 | Bigger Payouts | Every slot win pays double (coins still stop at 9,999). |
 | Slot Odds | **Normal** / Generous / Lucky |
+
+## Safari Zone Cheats
+
+Kanto (FireRed / LeafGreen) and Hoenn (Ruby / Sapphire / Emerald) Safari Zones.
+
+| Option | What it does |
+|---|---|
+| Infinite Safari Steps | The steps never run out. The game ends when you leave. |
+| No Running Away | Wild Safari Pokémon never flee. Bait, Rocks, Pokéblocks and Go Near still change the catch odds. |
+| Unlimited Balls | A thrown Safari Ball is given back, so the count never goes down. |
 
 ---
 
