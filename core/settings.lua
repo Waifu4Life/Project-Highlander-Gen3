@@ -28,6 +28,7 @@ return function(mod)
     run_everywhere = true,
     sparkling_hidden = true,
     unlimited_pp = false, -- Off by default: borderline cheating
+    status_reset = false, -- Off by default (BATTLE SCREEN > STATUS CONDITION RESET)
     use_repel_again = true,
     borders_enabled = true,
     border_scope = "game", -- "game" | "save"

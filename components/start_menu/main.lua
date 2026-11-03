@@ -193,9 +193,12 @@ return function(ctx)
   -- the game's own keyboard; an empty name puts the usual one back
   function M.rename(key, session)
     local Naming = require("src.ui.game3.naming")
+    -- A blank name comes back as nil (the keyboard has no default here):
+    -- that also puts the usual name back.
     local function done(name)
-      if type(name) == "string" then
-        S.setName(key, name)
+      if name == nil or type(name) == "string" then
+        if type(name) == "string" and name:match("^%s*$") then name = "" end
+        S.setName(key, name or "")
         M.syncNames()
       end
     end

@@ -204,6 +204,7 @@ return function(ctx)
         end,
       },
       toggleRow("modern_exp_share", "MODERN EXP SHARING", "modern_exp_share"),
+      toggleRow("status_reset", "STATUS CONDITION RESET", "status_reset"),
       toggleRow("unlimited_pp", "UNLIMITED PP", "unlimited_pp"),
     }
   end

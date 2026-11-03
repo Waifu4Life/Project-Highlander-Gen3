@@ -1,5 +1,12 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.85.0
+- BATTLE SCREEN: new STATUS CONDITION RESET (Off by default). Like Pokémon Legends: Arceus, every
+  Pokémon in your party loses its status condition (poison, burn, paralysis, sleep, freeze) when a
+  battle ends. HP and fainted Pokémon are left as they are. Link battles keep the normal rules.
+- START MENU SETTINGS > CUSTOM RENAME: leaving the name blank now puts the item's usual name back
+  (the old custom name used to stay).
+
 ## 1.84.0
 - START MENU (Ruby/Sapphire): a shortcut to an OPTIONS page (HIGHLANDER, other mods' pages) opens
   that page right away; the game's OPTIONS menu no longer flashes on screen first.

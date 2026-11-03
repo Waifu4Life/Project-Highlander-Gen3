@@ -2,6 +2,7 @@
 --   Skip Recaps in FR & LG                          (this file)
 --   Always Boosted EXP, Modern EXP Sharing          -> exp.lua
 --   Unlimited PP                                    -> unlimited_pp.lua
+--   Status Condition Reset                          -> status_reset.lua
 --   Infinite Safari, Run Everywhere,
 --   Sparkling Hidden Items, Use Repel Again?        -> field.lua
 --   Rematch Anyone, Anytime                         -> rematch.lua
@@ -39,7 +40,7 @@ return function(ctx)
   ctx.qolPatch = patch
 
   local parts = {}
-  for _, name in ipairs({ "exp", "unlimited_pp", "field", "rematch", "safari" }) do
+  for _, name in ipairs({ "exp", "unlimited_pp", "status_reset", "field", "rematch", "safari" }) do
     local ok, part = pcall(function() return loadLocal("components/qol/" .. name .. ".lua")(ctx, patch) end)
     if ok and type(part) == "table" then
       parts[#parts + 1] = part
