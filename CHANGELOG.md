@@ -1,5 +1,12 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.86.0
+- FILL HOENN REGIONAL DEX > GET OTHER GAME EXCLUSIVES (Emerald): Surskit, Meditite, Medicham and
+  Roselia no longer need Ruby or Sapphire installed. Their Ruby/Sapphire slots are now built into
+  the mod (Route 102, 111, 114, 117 and 120, Mt. Pyre's outside and Victory Road B1F/B2F), like
+  Gen1+2's Yellow and Crystal. An installed Ruby or Sapphire is still read first. The Pokédex
+  LOCATION tab shows them too.
+
 ## 1.85.0
 - BATTLE SCREEN: new STATUS CONDITION RESET (Off by default). Like Pokémon Legends: Arceus, every
   Pokémon in your party loses its status condition (poison, burn, paralysis, sleep, freeze) when a

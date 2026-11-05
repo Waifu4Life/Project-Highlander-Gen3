@@ -27,7 +27,8 @@
 --                           Emerald: Seviper/Solrock have a 50% chance to be
 --                           Zangoose/Lunatone, and Surskit, Meditite, Medicham and
 --                           Roselia get Ruby/Sapphire's own slots (read from your
---                           installed Ruby or Sapphire).
+--                           installed Ruby or Sapphire, else the built-in copy:
+--                           no other game needed).
 --   INFINITE TRIES FOR RARE PKMN  the Regis, the weather trio, Latias/Latios
 --                           (Southern Island and roaming), Jirachi, Deoxys, Mew,
 --                           Lugia, Ho-Oh and Sudowoodo stay when they aren't
@@ -1318,28 +1319,93 @@ return function(ctx)
   local addState = nil
   local rsData, rsTried = nil, false
 
+  -- Ruby/Sapphire's own slots for the four, built in so Emerald doesn't need
+  -- Ruby or Sapphire installed (like Gen1+2's Yellow/Crystal). Read from the
+  -- Ruby and Sapphire encounter tables (identical for these four).
+  -- { map, area, slot (1-based), species, minLevel, maxLevel }
+  local RS_SLOTS = {
+    { "MAP_MT_PYRE_EXTERIOR", "land", 2, "MEDITITE", 27, 27 },
+    { "MAP_MT_PYRE_EXTERIOR", "land", 4, "MEDITITE", 29, 29 },
+    { "MAP_ROUTE102", "land", 12, "SURSKIT", 3, 3 },
+    { "MAP_ROUTE102", "water", 5, "SURSKIT", 20, 30 },
+    { "MAP_ROUTE111", "water", 5, "SURSKIT", 20, 30 },
+    { "MAP_ROUTE114", "land", 12, "SURSKIT", 15, 15 },
+    { "MAP_ROUTE114", "water", 5, "SURSKIT", 20, 30 },
+    { "MAP_ROUTE117", "land", 2, "ROSELIA", 13, 13 },
+    { "MAP_ROUTE117", "land", 4, "ROSELIA", 14, 14 },
+    { "MAP_ROUTE117", "land", 12, "SURSKIT", 13, 13 },
+    { "MAP_ROUTE117", "water", 5, "SURSKIT", 20, 30 },
+    { "MAP_ROUTE120", "land", 12, "SURSKIT", 25, 25 },
+    { "MAP_ROUTE120", "water", 5, "SURSKIT", 20, 30 },
+    { "MAP_VICTORY_ROAD_B1F", "land", 4, "MEDICHAM", 40, 40 },
+    { "MAP_VICTORY_ROAD_B1F", "land", 10, "MEDITITE", 38, 38 },
+    { "MAP_VICTORY_ROAD_B1F", "land", 12, "MEDITITE", 38, 38 },
+    { "MAP_VICTORY_ROAD_B2F", "land", 4, "MEDICHAM", 40, 40 },
+    { "MAP_VICTORY_ROAD_B2F", "land", 10, "MEDICHAM", 42, 42 },
+    { "MAP_VICTORY_ROAD_B2F", "land", 12, "MEDICHAM", 44, 44 },
+  }
+
+  -- the built-in slots in the same shape as an installed game's encounters.lua
+  -- (other slots are left empty, species 0, so they are never touched)
+  local function builtInRsTables()
+    local C = req("src.core.game3.constants")
+    if not C then return nil end
+    local ok, rc = pcall(C.of, "ruby")
+    if not (ok and rc and rc.map_groups and rc.map_groups.byName) then return nil end
+    local tables = {}
+    for _, e in ipairs(RS_SLOTS) do
+      local row = rc.map_groups.byName[e[1]]
+      local sp = SP(e[4])
+      if type(row) == "table" and sp then
+        local k = row.group .. ":" .. row.num
+        local t = tables[k]
+        if not t then
+          t = { mapGroup = row.group, mapNum = row.num }
+          tables[k] = t
+        end
+        if not t[e[2]] then
+          local slots = {}
+          for i = 1, (e[2] == "land" and 12 or 5) do slots[i] = { species = 0, minLevel = 1, maxLevel = 1 } end
+          t[e[2]] = { slots = slots }
+        end
+        t[e[2]].slots[e[3]] = { species = sp, minLevel = e[5], maxLevel = e[6] }
+      end
+    end
+    if not next(tables) then return nil end
+    return { tables = tables, version = "ruby" }
+  end
+
   local function loadRsTables()
     if rsTried then return rsData end
-    rsTried = true
     local GameVersion = req("src.core.GameVersion")
     local CacheFs = req("src.import.CacheFs")
     local CachePaths = req("src.core.game3.cache_paths")
-    if not (GameVersion and CacheFs and CacheFs.readAt) then return nil end
-    local root = (CachePaths and CachePaths.CACHE_ROOT) or "data/generated/gba"
-    for _, v in ipairs({ "ruby", "sapphire" }) do
-      local ok, data = pcall(function()
-        local inf = GameVersion.info(v)
-        local src = CacheFs.readAt(((inf and inf.cachePrefix) or "") .. root .. "/encounters.lua")
-        if not src then return nil end
-        return assert(load(src, "@" .. v .. " encounters", "t", {}))()
-      end)
-      if ok and type(data) == "table" then
-        rsData = { tables = data, version = v }
-        info("emerald exclusives: using %s's encounter tables", v)
-        return rsData
+    if GameVersion and CacheFs and CacheFs.readAt then
+      local root = (CachePaths and CachePaths.CACHE_ROOT) or "data/generated/gba"
+      for _, v in ipairs({ "ruby", "sapphire" }) do
+        local ok, data = pcall(function()
+          local inf = GameVersion.info(v)
+          local src = CacheFs.readAt(((inf and inf.cachePrefix) or "") .. root .. "/encounters.lua")
+          if not src then return nil end
+          return assert(load(src, "@" .. v .. " encounters", "t", {}))()
+        end)
+        if ok and type(data) == "table" then
+          rsTried = true
+          rsData = { tables = data, version = v }
+          info("emerald exclusives: using %s's encounter tables", v)
+          return rsData
+        end
       end
     end
-    info("emerald exclusives: Ruby/Sapphire not installed, Surskit/Meditite/Medicham/Roselia not added")
+    -- no Ruby/Sapphire installed: the built-in copy of their slots
+    local ok, data = pcall(builtInRsTables)
+    if ok and data then
+      rsTried = true
+      rsData = data
+      info("emerald exclusives: Ruby/Sapphire not installed, using the built-in Ruby/Sapphire slots")
+      return rsData
+    end
+    if not ok then warn("built-in slots", data) end
     return nil
   end
 
