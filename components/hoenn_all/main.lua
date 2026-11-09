@@ -488,9 +488,10 @@ return function(ctx)
     end
     return false
   end
-  local function npcUsesFlag(eo, name)
+  -- depth: how many jumps to follow (3 by default)
+  local function npcUsesFlag(eo, name, depth)
     local key = eo and eo.def and eo.def.scriptKey
-    return key and scriptUsesFlag(key, flagId(name), 3, {}) or false
+    return key and scriptUsesFlag(key, flagId(name), depth or 3, {}) or false
   end
 
   -- every text a script (and the scripts it jumps to) shows, upper-case
@@ -1265,7 +1266,9 @@ return function(ctx)
           and npcUsesFlag(eo, "FLAG_RECEIVED_FOSSIL_MON") then
         return talkScientist(eo)
       end
-      if map:find("SLATEPORT", 1, true) and deepSeaReady() and npcUsesFlag(eo, "FLAG_EXCHANGED_SCANNER") then
+      -- Stern sets FLAG_EXCHANGED_SCANNER 4 jumps in (7th badge > Scanner > yes/no > the item you
+      -- pick), the same in Ruby, Sapphire and Emerald. No other Slateport script uses that flag.
+      if map:find("SLATEPORT", 1, true) and deepSeaReady() and npcUsesFlag(eo, "FLAG_EXCHANGED_SCANNER", 5) then
         return talkStern(eo)
       end
       return false

@@ -16,6 +16,11 @@
 --   sparkle on the ground, drawn over the map's top layer (tall grass, tree tops). Picking it up clears
 --   the game's own flag, so the sparkle goes away.
 --
+-- FEEBAS TILES (always on, Ruby/Sapphire/Emerald)
+--   On Route 119 the water tiles where Feebas can be fished shimmer. They
+--   follow the Dewford trend like the game's own Feebas check, so they move
+--   when the trend changes.
+--
 -- QOL > USE REPEL AGAIN?
 --   The last Repel used is remembered in the save. When one wears off and you
 --   still have that kind, the game asks "Use another ...?". Yes uses it through
@@ -194,6 +199,140 @@ return function(ctx, patch)
     return n
   end
 
+  -- ---------------------------------------------------- feebas tile shimmer
+  -- Always on (Ruby/Sapphire/Emerald, Route 119). The six Feebas tiles are
+  -- worked out exactly like the game's checkFeebas does it (seed from the
+  -- current Dewford trend, same LCG, same per-section tile numbering), but
+  -- without touching the game's RNG. Each matching water tile shimmers.
+
+  local NUM_FEEBAS_SPOTS = 6
+  local NUM_FISHING_SPOTS = 131 + 167 + 149
+  local feebasCache = { key = nil, tiles = nil }
+
+  local function feebasRules()
+    local Encounters = mreq("src.core.game3.encounters")
+    if not (Encounters and Encounters.rules) then return nil end
+    local ok, R = pcall(Encounters.rules)
+    if not (ok and type(R) == "table" and R.checkFeebas and R.wildExtra) then return nil end
+    return R, Encounters
+  end
+
+  local function onRoute119(mapId, Encounters)
+    local MapIds = mreq("src.core.game3.map_ids")
+    local H = Encounters._h
+    if not (MapIds and MapIds.forConst and H and H.constants) then return false end
+    local ok, id = pcall(MapIds.forConst, "MAP_ROUTE119", H.constants().game)
+    return ok and id ~= nil and id == mapId
+  end
+
+  local function feebasTiles(mapId)
+    local R, Encounters = feebasRules()
+    if not R or not onRoute119(mapId, Encounters) then return nil end
+    local bitlib = mreq("bit")
+    local Rng = mreq("src.core.game3.rng")
+    local Coll = mreq("src.core.game3.collision")
+    local CollRse = package and package.loaded and package.loaded["src.core.game3.scripting.collision_rse"]
+      or mreq("src.core.game3.scripting.collision_rse")
+    local bits = CollRse and CollRse._tileBits
+    local layout = Coll and Coll._mapDef and Coll._mapDef.midLayout
+    local width = layout and tonumber(layout.width)
+    if not (bitlib and Rng and Rng.mulU32 and Coll and Coll.behavior and bits and width) then return nil end
+    local sess = session()
+    local trend = sess and type(sess.dewfordTrends) == "table" and sess.dewfordTrends[1]
+    local seed = tonumber(trend and trend.rand) or 0
+    local key = tostring(mapId) .. ":" .. seed .. ":" .. tostring(layout)
+    if feebasCache.key == key then return feebasCache.tiles end
+
+    -- the same six spot numbers the game rolls (wild_encounter.c:136)
+    local state = seed
+    local wanted = {}
+    local i = 0
+    while i ~= NUM_FEEBAS_SPOTS do
+      state = (Rng.mulU32(1103515245, state) + 12345) % 4294967296
+      local v = math.floor(state / 65536) % NUM_FISHING_SPOTS
+      if v == 0 then v = NUM_FISHING_SPOTS end
+      if v < 1 or v >= 4 then
+        wanted[v] = true
+        i = i + 1
+      end
+    end
+
+    -- number the water tiles the way the game does (wild_encounter.c:90):
+    -- a tile's section comes from its row (last match wins, else the first)
+    local sections = R.wildExtra().feebas.sections
+    local function sectionOf(y)
+      local s = 1
+      for k = 1, 3 do
+        local sec = sections[k]
+        if sec and y >= sec.yMin and y <= sec.yMax then s = k end
+      end
+      return s
+    end
+    local MB = mreq("src.core.game3.mb")
+    local waterfall = MB and MB.id and MB.id("WATERFALL")
+    local tiles = {}
+    for k = 1, 3 do
+      local sec = sections[k]
+      if sec then
+        local spot = sec.spotBase
+        for y = sec.yMin, sec.yMax do
+          for x = 0, width - 1 do
+            local b = Coll.behavior(x, y)
+            local tb = b ~= nil and (tonumber(bits[b]) or 0) or 0
+            if bitlib.band(tb, 2) ~= 0 and b ~= waterfall then
+              spot = spot + 1
+              if wanted[spot] and sectionOf(y) == k then
+                tiles[#tiles + 1] = { x = x, y = y }
+              end
+            end
+          end
+        end
+      end
+    end
+    feebasCache.key, feebasCache.tiles = key, tiles
+    return tiles
+  end
+
+  local function drawFeebas(camX, camY)
+    local Field = mreq("src.core.game3.field")
+    local Map = mreq("src.core.game3.map")
+    local sess = (Field and Field._session) or session()
+    local mapId = (sess and sess.map) or (Map and Map.current)
+    if not mapId then return end
+    local tiles = feebasTiles(mapId)
+    if not tiles or #tiles == 0 then return end
+    local G = love.graphics
+    local now = (love.timer and love.timer.getTime and love.timer.getTime()) or 0
+    G.push("all")
+    pcall(G.setShader)
+    for _, t in ipairs(tiles) do
+      local px = math.floor(t.x * CELL - camX)
+      local py = math.floor(t.y * CELL - camY)
+      if px > -CELL and py > -CELL and px < 512 and py < 384 then
+        local phase = now * 3 + t.x * 1.3 + t.y * 0.9
+        local pulse = 0.5 + 0.5 * math.sin(phase)
+        -- soft glow over the water tile
+        G.setBlendMode("add")
+        G.setColor(0.55, 0.75, 1.0, 0.18 + 0.22 * pulse)
+        G.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+        G.setColor(1.0, 0.85, 1.0, 0.25 + 0.35 * pulse)
+        G.rectangle("fill", px + 1, py + 1, CELL - 2, 1)
+        G.rectangle("fill", px + 1, py + CELL - 2, CELL - 2, 1)
+        G.rectangle("fill", px + 1, py + 2, 1, CELL - 4)
+        G.rectangle("fill", px + CELL - 2, py + 2, 1, CELL - 4)
+        -- small twinkle that hops between the tile's corners
+        G.setBlendMode("alpha")
+        local corner = math.floor(phase / math.pi) % 4
+        local sx = px + ((corner == 0 or corner == 3) and 5 or 10)
+        local sy = py + ((corner == 0 or corner == 1) and 5 or 10)
+        G.setColor(1, 1, 1, math.abs(math.sin(phase)))
+        G.rectangle("fill", sx - 1, sy, 3, 1)
+        G.rectangle("fill", sx, sy - 1, 1, 3)
+      end
+    end
+    G.pop()
+  end
+
   -- Drawn with the effects that go over tall grass (drawFront), after the
   -- map's top layer, so grass and tree tops can't cover the sparkle.
   -- Backup: if the game didn't call drawFront during a field draw, the
@@ -206,8 +345,18 @@ return function(ctx, patch)
     assert(type(origFront) == "function" and type(origView) == "function", "field draw functions missing")
     local frontRan = false
 
+    local feebasWarned = false
     local function run(camX, camY, route)
       diag.route = route
+      local okF, errF = pcall(drawFeebas, camX, camY)
+      if not okF then
+        pcall(love.graphics.pop)
+        if mod.log and not feebasWarned then
+          feebasWarned = true
+          pcall(mod.log.warn, mod.log, "feebas tiles: %s", tostring(errF))
+        end
+      end
+      if S.get("sparkling_hidden") ~= true then return end
       local ok, err = pcall(drawSparkles, camX, camY)
       if not ok then
         diag.err = err
@@ -220,7 +369,7 @@ return function(ctx, patch)
 
     FieldEffects.drawFront = function(camX, camY, ...)
       local res = pack(origFront(camX, camY, ...))
-      if S.get("sparkling_hidden") == true and tonumber(camX) and tonumber(camY) then
+      if tonumber(camX) and tonumber(camY) then
         frontRan = true
         run(camX, camY, "front")
       end
@@ -230,7 +379,7 @@ return function(ctx, patch)
     FieldView.draw = function(game, canvasW, canvasH, opts, ...)
       frontRan = false
       local res = pack(origView(game, canvasW, canvasH, opts, ...))
-      if S.get("sparkling_hidden") == true and not (type(opts) == "table" and opts.actorsOnly) then
+      if not (type(opts) == "table" and opts.actorsOnly) then
         if not frontRan then
           pcall(function()
             local Player = mreq("src.core.game3.player")

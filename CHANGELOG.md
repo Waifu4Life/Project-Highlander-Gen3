@@ -1,5 +1,17 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.88.0
+- FEEBAS TILES (always on, Ruby/Sapphire/Emerald): on Route 119 the water tiles where Feebas can
+  be fished now shimmer, so there's no more fishing every tile to find them. They follow the
+  Dewford trend exactly like the game does, so they move when the trend changes. Feebas is still
+  a 50% bite on its tile, with any rod.
+
+## 1.87.0
+- FILL HOENN REGIONAL DEX > GET OTHER DEEP SEA ITEM: Captain Stern in the Slateport Harbor now
+  offers the other Deep Sea item. He used to give only his usual line about the ferry, before and
+  after becoming Champion, because the mod did not recognise him (his script sets the Scanner flag
+  one step deeper than the mod looked). Ruby, Sapphire and Emerald.
+
 ## 1.86.0
 - FILL HOENN REGIONAL DEX > GET OTHER GAME EXCLUSIVES (Emerald): Surskit, Meditite, Medicham and
   Roselia no longer need Ruby or Sapphire installed. Their Ruby/Sapphire slots are now built into

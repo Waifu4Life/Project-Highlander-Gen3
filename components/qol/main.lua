@@ -4,7 +4,8 @@
 --   Unlimited PP                                    -> unlimited_pp.lua
 --   Status Condition Reset                          -> status_reset.lua
 --   Infinite Safari, Run Everywhere,
---   Sparkling Hidden Items, Use Repel Again?        -> field.lua
+--   Sparkling Hidden Items, Use Repel Again?,
+--   Feebas tiles (always on)                         -> field.lua
 --   Rematch Anyone, Anytime                         -> rematch.lua
 --   Safari Zone: Unlimited Balls, No Running Away   -> safari.lua
 --   Decapitalize Words                              -> decap.lua (installed first, from main.lua)
