@@ -1,5 +1,9 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.89.0
+- MOUSE POINTER (always on): the mouse pointer hides over the game window after 2 seconds
+  without moving, and comes back as soon as you move the mouse or click.
+
 ## 1.88.0
 - FEEBAS TILES (always on, Ruby/Sapphire/Emerald): on Route 119 the water tiles where Feebas can
   be fished now shimmer, so there's no more fishing every tile to find them. They follow the

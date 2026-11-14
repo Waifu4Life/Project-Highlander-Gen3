@@ -45,6 +45,8 @@ return function(mod)
   -- Always on: take keyboard/gamepad focus when started from outside the
   -- launcher (frontend, Playnite, shortcuts) -- same fix as Project Highlander.
   pcall(function() loadLocal("core/window_focus.lua")(mod) end)
+  -- Always on: the mouse pointer hides after 2 seconds without moving.
+  pcall(function() loadLocal("core/mouse_hide.lua")(mod) end)
 
   local function install()
     -- Decapitalize Words goes first: it must sit under every other font hook.
