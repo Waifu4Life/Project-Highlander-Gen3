@@ -301,6 +301,156 @@ return function(ctx)
       or text:match("^%s*%d+%s*/%s*%d+%s*$")
   end
 
+  -- ------- Ruby/Sapphire: the game draws their party screen natively
+  -- (src/ui/game3/rs/party_chrome.lua, drawParty), never through
+  -- PartyChrome.drawSlot, so the hooks above never fire there. Instead the XP
+  -- is laid over the finished screen, built from the game's own HP-bar tiles:
+  --   * main box: one more light band (16 px) under the HP numbers, holding the
+  --     XP bar and the XP numbers, spaced exactly like the HP bar and numbers;
+  --   * small boxes: the HP numbers row is wiped and the XP bar sits there.
+
+  local RsChrome, RsKit, Pokemon
+  local rsLook = nil -- colours read from the HP label tile (once)
+  local rsQuads = {}
+
+  local function rsQuad(image, key, x, y, w, h)
+    local k = tostring(image) .. key
+    local q = rsQuads[k]
+    if not q then
+      q = love.graphics.newQuad(x, y, w, h, image:getDimensions())
+      rsQuads[k] = q
+    end
+    return q
+  end
+
+  local function rsTile(m, variant, frame, x, y)
+    local path = m.hpTiles.variants[variant]
+    local image = path and RsKit.image(path)
+    if not image then return end
+    local th = m.hpTiles.h or 8
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(image, rsQuad(image, path .. ":" .. frame, 0, frame * th, m.hpTiles.w or 8, th), x, y)
+  end
+
+  -- the "HP" label tile (caps frame 9): orange letters on a dark box, rows 2-5
+  local function rsLabelLook(m)
+    if rsLook then return rsLook end
+    local look = {
+      dark = { 0x52 / 255, 0x6B / 255, 0x5A / 255, 1 },
+      rows = { { 1, 0.71, 0.48, 1 }, { 1, 0.71, 0.48, 1 }, { 0.97, 0.58, 0.45, 1 }, { 0.87, 0.42, 0.35, 1 } },
+    }
+    pcall(function()
+      local data = love.image.newImageData(m.hpTiles.variants.caps)
+      local base = 9 * (m.hpTiles.h or 8)
+      local r, g, b = data:getPixel(6, base + 2)
+      look.dark = { r, g, b, 1 }
+      for i = 1, 4 do
+        r, g, b = data:getPixel(3, base + 1 + i)
+        look.rows[i] = { r, g, b, 1 }
+      end
+    end)
+    rsLook = look
+    return look
+  end
+
+  local RS_X = { "11011", "01110", "01110", "11011" }
+
+  -- an XP bar whose fill starts at tile (x, y), like the game's HP bar
+  local function rsXpBar(m, x, y, pct)
+    for i = 0, 5 do rsTile(m, "green", 0, x + i * 8, y) end -- empty bar
+    rsTile(m, "caps", 9, x - 16, y); rsTile(m, "caps", 10, x - 8, y); rsTile(m, "caps", 11, x + 48, y)
+    -- turn the H into an X
+    local look = rsLabelLook(m)
+    local lx = x - 16 + 3
+    love.graphics.setColor(look.dark)
+    love.graphics.rectangle("fill", lx, y + 2, 5, 4)
+    for r = 1, 4 do
+      setColor(look.rows[r])
+      local row = RS_X[r]
+      for c = 1, 5 do
+        if row:sub(c, c) == "1" then love.graphics.rectangle("fill", lx + c - 1, y + 1 + r, 1, 1) end
+      end
+    end
+    local w = math.floor(FILL_W * math.max(0, math.min(1, pct)) + 0.5)
+    if w > 0 then
+      setColor(BLUE); love.graphics.rectangle("fill", x, y + 3, w, 1)
+      setColor(BLUE_TOP); love.graphics.rectangle("fill", x, y + 4, w, 1)
+    end
+  end
+
+  local function rsText(value, x, y, right)
+    local opts = RsChrome.textOptions("monText")
+    opts.colors.bg = { 0, 0, 0, 0 }
+    if right then x = x - FrlgFont.measure(value, opts) end
+    FrlgFont.draw(value, x, y, opts)
+  end
+
+  local function rsSlot(ui, m, index, mon)
+    if type(mon) ~= "table" or Pokemon.isEgg(mon) or ui.slotDescription(index) then return end
+    local p = progress(mon)
+    if not p then return end
+    local maxed = (p.level or 1) >= 100
+    local pct = maxed and 1 or (p.progressPercent or 0)
+    local pos = m.coordinates.panels[1][index]
+    local hp = m.coordinates.hpBars[1][index]
+    local px, py = pos[1] * 8, pos[2] * 8
+    local bx, by = hp[1] * 8, hp[2] * 8
+    local large = index == 1
+    local panel = m.panels[large and "large" or "small"]
+    local image = RsKit.image(panel.variants[RsChrome.panelPalette(ui, index, mon)])
+    if not image then return end
+    local iw, ih = image:getDimensions()
+    love.graphics.setColor(1, 1, 1, 1)
+    if large then
+      -- a second copy of the light HP band (rows 32-47) under the first one
+      local band = by - py + 8 -- first row of the HP numbers band
+      local below = band + 8 -- first row under the band
+      love.graphics.draw(image, rsQuad(image, "band", 0, band, iw, 1), px, py + below, 0, 1, EXTRA)
+      love.graphics.draw(image, rsQuad(image, "tail", 0, below, iw, ih - below), px, py + below + EXTRA)
+      rsXpBar(m, bx, by + EXTRA, pct)
+      local data = m.textSettings[1][index]
+      local row = data.oam[6]
+      local hx, hy = data.x + row[2] % 512, data.y + row[1] % 256 - 8
+      rsText(maxed and "MAX" or string.format("%d/%d", tonumber(p.expProgress) or 0, tonumber(p.levelTotalExp) or 0),
+        hx + 35, hy + EXTRA, true)
+    else
+      -- wipe the HP numbers row with the box's own picture, then the bar goes there
+      local x0, y0 = (bx - 16) - px, by + 8 - py
+      if iw > x0 and ih - 1 > y0 then
+        love.graphics.draw(image, rsQuad(image, "wipe", x0, y0, iw - x0, ih - 1 - y0), px + x0, py + y0)
+      end
+      rsXpBar(m, bx, by + 8, pct)
+    end
+  end
+
+  local function rsEnabled(ui)
+    return ui == PartyMenu and S.flag("party_xp") and PartyMenu.open
+      and PartyMenu.mode ~= "summary" and PartyMenu.mode ~= "oak" and RsChrome.layout(ui) == 0
+  end
+
+  local function installRs()
+    local ok = pcall(function()
+      RsChrome = require("src.ui.game3.rs.party_chrome")
+      RsKit = require("src.ui.game3.rse.scene_kit")
+      Pokemon = require("src.core.game3.pokemon")
+    end)
+    if not (ok and type(RsChrome) == "table" and type(RsChrome.drawParty) == "function") then return end
+    local orig = RsChrome.drawParty
+    RsChrome.drawParty = function(ui, ...)
+      local result = orig(ui, ...)
+      if rsEnabled(ui) then
+        love.graphics.push("all")
+        local okDraw, err = pcall(function()
+          local m = RsChrome._man or RsChrome.manifest()
+          for i = 1, 6 do rsSlot(ui, m, i, ui._party and ui._party[i]) end
+        end)
+        love.graphics.pop()
+        if not okDraw and ctx.mod.log then ctx.mod.log:warn("party xp (RS): %s", tostring(err)) end
+      end
+      return result
+    end
+  end
+
   function X.install()
     if X.installed then return end
     PartyMenu = require("src.ui.game3.party_menu")
@@ -309,6 +459,7 @@ return function(ctx)
     FrlgFont = require("src.ui.game3.frlg_font")
     SummaryData = require("src.core.game3.summary_data")
     X.installed = true
+    installRs()
     local T = 8
 
     local origSlot = PartyChrome.drawSlot

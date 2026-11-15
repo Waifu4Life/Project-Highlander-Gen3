@@ -6,6 +6,7 @@ return function(mod)
   local S = { ID = ID }
 
   S.DEFAULT_ORDER = { "pokedex", "pokemon", "bag", "pokebox", "trainer", "save", "option", "mods", "pokenav" }
+  S.GAP = "-" -- an empty tile in the Start Menu order
   S.KNOWN = {}
   for _, id in ipairs(S.DEFAULT_ORDER) do S.KNOWN[id] = true end
 
@@ -250,16 +251,24 @@ return function(mod)
     local out, seen = {}, {}
     if type(raw) == "string" then
       for id in raw:gmatch("[^,%s]+") do
-        -- built-in ids, and "x:<KEY>" for other mods' items (see S.extraKey)
-        if (S.KNOWN[id] or id:match("^x:[%w_]+$")) and not seen[id] then
+        -- built-in ids, "x:<KEY>" for other mods' items (see S.extraKey),
+        -- "exit" once EXIT has been moved (absent: EXIT keeps the last tile),
+        -- and "-" for an empty tile left in the Sort Menu (any number of them)
+        if id == S.GAP then
+          out[#out + 1] = id
+        elseif (S.KNOWN[id] or id == "exit" or id:match("^x:[%w_]+$")) and not seen[id] then
           out[#out + 1] = id
           seen[id] = true
         end
       end
     end
+    while out[#out] == S.GAP do out[#out] = nil end
+    -- ids the order doesn't have yet go at the end (before EXIT when it's last)
+    local exitLast = out[#out] == "exit" and table.remove(out)
     for _, id in ipairs(S.DEFAULT_ORDER) do
       if not seen[id] then out[#out + 1] = id end
     end
+    if exitLast then out[#out + 1] = "exit" end
     return out
   end
 

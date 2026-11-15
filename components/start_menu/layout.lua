@@ -1,6 +1,7 @@
--- Grid model: 2 columns x 5 rows per page. EXIT always takes the bottom-right
--- tile of the LAST page; with more than nine items besides EXIT the grid gets
--- more pages (like the Gen 1/2 FULL SCREEN Start Menu).
+-- Grid model: 2 columns x 5 rows per page. EXIT takes the bottom-right tile of
+-- the LAST page until it is moved in the Sort Menu (then it is an ordinary
+-- tile); with more than nine items besides EXIT the grid gets more pages (like
+-- the Gen 1/2 FULL SCREEN Start Menu).
 return function(ctx)
   local L = {}
   L.COLS, L.ROWS = 2, 5
@@ -50,9 +51,11 @@ return function(ctx)
   end
 
   -- Build the slots from the menu's live entries in the saved order (built-in
-  -- items and other mods' items alike); items the order doesn't mention yet
+  -- items and other mods' items alike; "-" is an empty tile, kept as a false
+  -- slot the cursor skips); items the order doesn't mention yet
   -- follow in the game's order, then EXIT on the bottom-right tile of the
-  -- last page. Returns nil only when the menu has no EXIT.
+  -- last page, unless the order places EXIT too. Returns nil only when the
+  -- menu has no EXIT.
   function L.fromEntries(entries, order)
     local S = ctx.settings
     local exitEntry, exitIndex
@@ -84,25 +87,32 @@ return function(ctx)
       end
     end
     if not exitEntry then return nil end
-    local list, used = {}, {}
+    local exitSlot = { id = "exit", entry = exitEntry, index = exitIndex,
+      label = L.tileLabel("exit", L.label("exit")) }
+    -- EXIT in the saved order: it was moved in the Sort Menu, so it is an
+    -- ordinary tile there. Otherwise it keeps the bottom-right of the last page.
+    byKey.exit = exitSlot
+    local list, used, exitMoved = {}, {}, false
     for _, key in ipairs(order or {}) do
-      if byKey[key] and not used[key] then
+      if key == S.GAP then
+        list[#list + 1] = false -- an empty tile left in the Sort Menu
+      elseif byKey[key] and not used[key] then
         list[#list + 1] = byKey[key]
         used[key] = true
+        if key == "exit" then exitMoved = true end
       end
     end
+    while #list > 0 and list[#list] == false do list[#list] = nil end
+    -- items the order doesn't have go at the end (before EXIT when it's last)
+    local exitLast = list[#list] == exitSlot and table.remove(list)
     for _, key in ipairs(native) do
       if not used[key] then
         list[#list + 1] = byKey[key]
         used[key] = true
       end
     end
-    local total = math.max(1, math.ceil((#list + 1) / L.PAGE)) * L.PAGE
-    local out = { total = total }
-    for i = 1, total - 1 do out[i] = list[i] or false end
-    out[total] = { id = "exit", entry = exitEntry, index = exitIndex,
-      label = L.tileLabel("exit", L.label("exit")) }
-    return out
+    if exitLast then list[#list + 1] = exitLast end
+    return L.fromList(list, not exitMoved and exitSlot or nil)
   end
 
   -- Slots from a list of { key, label, ... } (Sort Menu, CUSTOM ICONS):

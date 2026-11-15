@@ -1,5 +1,30 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.93.0
+- SORT MENU: EXIT stays where you put it. Put on the bottom row with empty tiles after it (for
+  example bottom-left, with the bottom-right tile empty), it used to jump back to the bottom-right
+  tile. Now only SELECT (default order) puts it back there. When EXIT is the last item, new items
+  go in before it, like Gen1+2's QUIT.
+
+## 1.92.0
+- SORT MENU: you can leave empty spaces, like in Gen1+2. Empty tiles show just their corners and
+  can be picked as the place to put an item, so moving an item onto one leaves a gap behind. The
+  Start Menu keeps the gaps, and the cursor skips over them. There's always at least one empty
+  tile: when the pages are full, an empty page is added. SELECT (default order) closes all gaps.
+
+## 1.91.0
+- SORT MENU: EXIT can be moved like any other tile, as in Gen1+2. Until it's moved it stays on
+  the bottom-right tile of the last page, with new items going in before it. Moving it back to the
+  end puts it on the bottom-right tile again, and SELECT (default order) does too.
+
+## 1.90.0
+- QOL > DISPLAY XP IN PARTY MENU works in Ruby and Sapphire again. G1R Deluxe now draws the
+  Ruby/Sapphire party screen with its own native renderer, which the XP display didn't hook into,
+  so the toggle did nothing there. The XP bar is now built from Ruby/Sapphire's own HP-bar tiles
+  (labelled XP, blue fill): the first Pokémon's box grows by one band for the XP bar and
+  numbers, and the other five show the XP bar where their HP numbers were. Not shown in
+  double-battle layouts, the same as the other games.
+
 ## 1.89.0
 - MOUSE POINTER (always on): the mouse pointer hides over the game window after 2 seconds
   without moving, and comes back as soon as you move the mouse or click.

@@ -241,6 +241,28 @@ return function(ctx)
     love.graphics.setColor(1, 1, 1, 1)
   end
 
+  -- an empty tile (Sort Menu): just its four corners, brighter under the cursor
+  function D.emptyTile(index, theme, selected)
+    local x, y, w, h = L.rect(index)
+    local arm = 5
+    if selected then
+      local pulse = 0.55 + 0.45 * math.abs(math.sin(now() * 3))
+      setc(theme.main, pulse)
+    else
+      setc(EDGE, 0.85)
+    end
+    for _, c in ipairs({ { x, y, 1, 1 }, { x + w - 1, y, -1, 1 }, { x, y + h - 1, 1, -1 }, { x + w - 1, y + h - 1, -1, -1 } }) do
+      local cx, cy, dx, dy = c[1], c[2], c[3], c[4]
+      love.graphics.rectangle("fill", dx > 0 and cx or cx - arm + 1, cy, arm, 1)
+      love.graphics.rectangle("fill", cx, dy > 0 and cy or cy - arm + 1, 1, arm)
+      if selected then -- doubled, like the 2 px frame round a selected tile
+        love.graphics.rectangle("fill", dx > 0 and cx or cx - arm + 1, cy + dy, arm, 1)
+        love.graphics.rectangle("fill", cx + dx, dy > 0 and cy or cy - arm + 1, 1, arm)
+      end
+    end
+    love.graphics.setColor(1, 1, 1, 1)
+  end
+
   -- draws the page the cursor is on (a held tile shows when it's on that page)
   function D.grid(slots, cursor, theme, opts)
     opts = opts or {}
@@ -248,7 +270,9 @@ return function(ctx)
     local first = (page - 1) * L.PAGE + 1
     for i = first, math.min(L.total(slots), first + L.PAGE - 1) do
       local slot = slots[i]
-      if slot then
+      if slot and slot.gap then
+        D.emptyTile(i, theme, i == cursor)
+      elseif slot then
         local held = opts.held == i
         D.tile(slot, i, theme, {
           selected = (i == cursor) and not held,

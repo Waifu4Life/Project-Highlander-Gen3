@@ -1,6 +1,10 @@
 -- Sort Menu: arrange the Start Menu items. A = pick up / place (swap),
--- B = drop / done, SELECT = default order. EXIT stays in the bottom-right of
--- the last page. Other mods' items are sorted too (more than nine items: pages).
+-- B = drop / done, SELECT = default order. Like Gen1+2, a tile can be put on
+-- an empty tile, leaving a gap behind that the Start Menu keeps (saved as "-");
+-- there is always at least one empty tile. EXIT can be moved like any other
+-- tile; until it is, it stays in the bottom-right of the last page (SELECT
+-- puts it back there). Other mods' items are sorted
+-- too (more than nine items: pages).
 return function(ctx)
   local S, L, D = ctx.settings, ctx.layout, ctx.draw
   local Sort = { isMenu = true, open = false }
@@ -59,6 +63,8 @@ return function(ctx)
       slotFor[id] = { id = id, label = L.tileLabel(id,
         id == "trainer" and playerLabel(Sort._session) or L.label(id)) }
     end
+    local exitSlot = { id = "exit", label = L.tileLabel("exit", L.label("exit")) }
+    slotFor.exit = exitSlot
     local extraKeys = {}
     for _, x in ipairs(extras()) do
       if not S.isHidden(x.key) then
@@ -70,34 +76,95 @@ return function(ctx)
     -- the saved order, plus extras it doesn't know yet (at the end, before EXIT)
     local full, inFull = S.order(), {}
     for _, key in ipairs(full) do inFull[key] = true end
+    local exitLast = full[#full] == "exit" and table.remove(full)
     for _, key in ipairs(extraKeys) do
       if not inFull[key] then full[#full + 1] = key; inFull[key] = true end
     end
-    local visible, list = {}, {}
+    if exitLast then full[#full + 1] = exitLast end
+    -- the tiles shown here, in order ("-" = an empty tile), none empty at the end
+    local visible = {}
     for _, key in ipairs(full) do
-      if slotFor[key] then
-        visible[#visible + 1] = key
-        list[#list + 1] = slotFor[key]
-      end
+      if slotFor[key] or key == S.GAP then visible[#visible + 1] = key end
     end
-    Sort._full, Sort._visible = full, visible
-    Sort._slots = L.fromList(list, { id = "exit", label = L.tileLabel("exit", L.label("exit")), fixed = true })
+    while visible[#visible] == S.GAP do visible[#visible] = nil end
+    Sort._full, Sort._slotFor = full, slotFor
+    -- Every tile gets a key. EXIT not in the order yet: it sits on the
+    -- bottom-right tile of the last page, as on the Start Menu. Like Gen1+2,
+    -- there is always at least one empty tile to move something into (a
+    -- page of empty tiles is added when there isn't).
+    local pinned = not inFull.exit
+    Sort._exitPinned = pinned
+    local total = math.max(1, math.ceil((#visible + (pinned and 1 or 0)) / L.PAGE)) * L.PAGE
+    local keys = {}
+    for i = 1, total do keys[i] = visible[i] or S.GAP end
+    if pinned then keys[total] = "exit" end
+    local free = false
+    for i = 1, total do if keys[i] == S.GAP then free = true break end end
+    if not free then
+      for i = total + 1, total + L.PAGE do keys[i] = S.GAP end
+      total = total + L.PAGE
+    end
+    Sort._keys = keys
+    local slots = { total = total }
+    for i = 1, total do
+      slots[i] = keys[i] == S.GAP and { id = "gap", gap = true } or slotFor[keys[i]]
+    end
+    Sort._slots = slots
   end
 
-  local function save()
-    -- write the visible order back into the shared list, keeping hidden ids in place
-    local set = {}
-    for _, id in ipairs(Sort._visible) do set[id] = true end
-    local out, k = {}, 1
+  -- Write the tiles back as the saved order: empty tiles as "-", none at the
+  -- end. A pinned EXIT that wasn't moved stays out of the order (so it keeps
+  -- following the bottom-right tile); once moved, it stays where it was put.
+  -- Items this game doesn't show stay at the same tile number.
+  local function save(keys, keepPinned)
+    local tiles = {}
+    for i = 1, #keys do
+      tiles[i] = (keepPinned and keys[i] == "exit") and S.GAP or keys[i]
+    end
+    while tiles[#tiles] == S.GAP do tiles[#tiles] = nil end
+    local after, n = {}, 0 -- hidden ids, by the number of shown tiles before them
     for _, id in ipairs(Sort._full) do
-      if set[id] then
-        out[#out + 1] = Sort._visible[k]
-        k = k + 1
+      if id == S.GAP or Sort._slotFor[id] then
+        n = n + 1
       else
-        out[#out + 1] = id
+        after[n] = after[n] or {}
+        table.insert(after[n], id)
       end
     end
+    local out = {}
+    local function hidden(i)
+      for _, id in ipairs(after[i] or {}) do out[#out + 1] = id end
+      after[i] = nil
+    end
+    hidden(0)
+    for i, id in ipairs(tiles) do
+      out[#out + 1] = id
+      hidden(i)
+    end
+    for i = #tiles + 1, n do hidden(i) end
+    while out[#out] == S.GAP do out[#out] = nil end
     S.setOrder(out)
+  end
+
+  -- swap two tiles (one may be empty); returns the tile the held one is on now
+  local function swap(a, b)
+    local keys = {}
+    for i, k in ipairs(Sort._keys) do keys[i] = k end
+    local exitMoved = keys[a] == "exit" or keys[b] == "exit"
+    keys[a], keys[b] = keys[b], keys[a]
+    local moved = keys[b]
+    save(keys, Sort._exitPinned and not exitMoved)
+    build()
+    for i, k in ipairs(Sort._keys) do if k == moved then return i end end
+    return b
+  end
+
+  local function firstItem()
+    for i = 1, L.total(Sort._slots) do
+      local s = Sort._slots[i]
+      if s and not s.gap then return i end
+    end
+    return 1
   end
 
   function Sort.show(opts)
@@ -107,7 +174,7 @@ return function(ctx)
     Sort._onClose = opts.onClose
     Sort._held = nil
     build()
-    Sort.cursor = L.firstFilled(Sort._slots)
+    Sort.cursor = firstItem()
     require("src.ui.game3.stack").push("ph3_sort", Sort, { hideBelow = true, fullscreen = true })
     se("SE_WIN_OPEN")
   end
@@ -123,9 +190,10 @@ return function(ctx)
 
   function Sort.isOpen() return Sort.open end
 
+  -- an empty tile can't be picked up, but a held tile can be put on one
   local function movable(i)
     local s = Sort._slots[i]
-    return s and not s.fixed
+    return s and not s.gap
   end
 
   function Sort.handleInput(input)
@@ -144,12 +212,8 @@ return function(ctx)
           se("SE_FAILURE")
         end
       else
-        if movable(Sort.cursor) then
-          local a, b = Sort._held, Sort.cursor
-          Sort._visible[a], Sort._visible[b] = Sort._visible[b], Sort._visible[a]
-          save()
-          build()
-          Sort.cursor = b
+        if Sort._slots[Sort.cursor] then
+          Sort.cursor = swap(Sort._held, Sort.cursor)
           Sort._held = nil
           se("SE_SELECT")
         else
