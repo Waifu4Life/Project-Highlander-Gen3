@@ -1,5 +1,42 @@
 # Project Highlander Gen3 — Changelog
 
+## 1.96.0
+- EXTRA TYPES: the extra Nurse Joy who gives the Fairy TMs now stands on the floor just right of the
+  PC, instead of on top of the counter. FireRed/LeafGreen: right of the PC in all 7 Pokémon Centers.
+  Ruby/Sapphire/Emerald: right of the PC too; in Petalburg, where someone already stands there, she
+  is one step further right. Talk to her face to face (no more talking across the counter).
+
+## 1.95.0
+- NEW: OTHER SYSTEM SETTINGS > LEARN TMS FASTER (On by default). Teaching a TM/HM to a Pokémon that
+  already knows 4 moves goes straight to the move list: no "is trying to learn…", "delete a move?"
+  or "1, 2 and… Poof!" text, just "<PKMN> learned <MOVE>!". B on the list cancels quietly; picking an
+  HM move still says it can't be forgotten. Level-up moves and the Move Tutor are unchanged.
+- NEW: OTHER SYSTEM SETTINGS > FAST PKMN CENTER (On by default). The nurse says "Welcome to the
+  POKéMON CENTER! May I heal your POKéMON?". NO: "Thank you, come again!". YES: she heals at once
+  with the normal machine animation, then "All done! Thank you, come again!". All five games;
+  Pokérus news and Emerald's Gold Card greeting are kept.
+
+## 1.94.0
+- NEW: OPTIONS > MECHANICS > EXTRA TYPES adds the Fairy type (Gen6 matchups; Fairy moves are
+  special). Two toggles, both off by default:
+  - FAIRY TYPE MOVES: Charm, Moonlight and Sweet Kiss become Fairy, and seven new Fairy TMs
+    come in: TM51 Dazzling Gleam, TM52 Disarming Voice, TM53 Draining Kiss (heals 3/4 of the
+    damage), TM54 Play Rough, TM55 Moonblast, TM56 Fairy Wind (Fairy-type PKMN only) and TM57
+    Baby-Doll Eyes. An extra Nurse Joy (to the right of the counter) gives each one once:
+    - FRLG: Pewter TM51, Route 4 TM57, Cerulean TM52, Vermilion TM55, Route 10 TM53,
+      Lavender TM54, Celadon TM56.
+    - RSE: Petalburg TM51, Dewford TM52, Mauville TM53, Fallarbor TM57, Fortree TM54,
+      Mossdeep TM55, Pacifidlog TM56.
+    - Later visits: "Have a nice day!" only.
+  - FAIRY TYPE PKMN: Gen6 Fairy typings (Clefairy line, Jigglypuff line, Togepi line, Snubbull
+    line, Marill line, Mr. Mime, Ralts line Psychic/Fairy, Azurill Normal/Fairy, Mawile
+    Steel/Fairy and more).
+  - Turning FAIRY TYPE MOVES off makes the moves Normal again and the extra Joys leave. TMs you
+    already have stay and still teach, and turning it back on never gives a second copy.
+  - The Fairy TMs show in the TM Case / bag, the Pokédex TM list and the summary screen.
+- Known limit: the new moves (ids 401–407) and TMs (items 651–657) are mod content; removing the
+  mod with them in a save leaves those ids unknown to the base game.
+
 ## 1.93.0
 - SORT MENU: EXIT stays where you put it. Put on the bottom row with empty tiles after it (for
   example bottom-left, with the bottom-right tile empty), it used to jump back to the bottom-right

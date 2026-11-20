@@ -184,6 +184,8 @@ return function(ctx)
       toggleRow("box_exclusive", "BOX EXCLUSIVE", "box_exclusive"),
       toggleRow("decapitalize", "DECAPITALIZE WORDS", "decapitalize"),
       toggleRow("party_xp", "DISPLAY XP IN PARTY MENU", "party_xp"),
+      toggleRow("fast_pkmn_center", "FAST PKMN CENTER", "fast_pkmn_center"),
+      toggleRow("learn_tms_faster", "LEARN TMS FASTER", "learn_tms_faster"),
       -- FireRed / LeafGreen only
       not S.isHoenn() and toggleRow("skip_recaps", "SKIP FR & LG RECAPS", "skip_recaps") or nil,
     }
@@ -324,6 +326,25 @@ return function(ctx)
       toggleRow("move_relearning", "MOVE RELEARNING", "move_relearning"),
       toggleRow("no_learn_hms", "NO LEARN HMS", "no_learn_hms"),
       toggleRow("tms_forever", "TMS FOREVER", "tms_forever"),
+    }
+  end
+
+  -- Moves first, then Pokémon (same order as Gen 1/2). Applied right away.
+  local function extraTypesRows()
+    local function row(id, label, key)
+      return {
+        id = "ph3_" .. id, label = label,
+        value = aligned(function() return onOff(S.get(key) == true) end),
+        step = function()
+          S.set(key, S.get(key) ~= true)
+          if ctx.extraTypes then pcall(ctx.extraTypes.apply) end
+          return true
+        end,
+      }
+    end
+    return {
+      row("fairy_moves", "FAIRY TYPE MOVES", "fairy_moves"),
+      row("fairy_pkmn", "FAIRY TYPE PKMN", "fairy_pkmn"),
     }
   end
 
@@ -536,6 +557,7 @@ return function(ctx)
     return {
       category("cat_mechanics", "MECHANICS", {
         page("battle_screen", "BATTLE SCREEN", battleScreenRows),
+        page("extra_types", "EXTRA TYPES", extraTypesRows),
         page("overworld_screen", "OVERWORLD SCREEN", overworldScreenRows),
         page("pokemoves", "POKéMOVES", pokemovesRows),
         page("shortcuts", "SHORTCUTS SETTINGS", shortcutRows),

@@ -65,7 +65,7 @@ return function(ctx, TypeColors)
       end
     end
     local key = TypeColors.key(typeId, Types)
-    return TypeColors.resolve(key, name, S.get("fairy_type") == true)
+    return TypeColors.resolve(key, name, S.get("fairy_moves") == true)
   end
 
   -- A thin frame in the move's type colour around the name; the inside stays

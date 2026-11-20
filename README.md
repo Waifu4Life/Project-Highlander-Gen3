@@ -112,6 +112,7 @@ The hub is split in three categories, like Project Highlander Gen1+2:
 | Category | Sub-menu | What it covers |
 |---|---|---|
 | **Mechanics** | Battle Screen | HUD and battle gameplay options. |
+| | Extra Types | Fairy type: Fairy moves + TM51–57 from extra Nurse Joys, and Gen6 Fairy typings. |
 | | Overworld Screen | Travel and exploration options. |
 | | PokéMoves | HM / TM / relearn tools. |
 | | Shortcuts Settings | Ball shortcuts in battle and Key Item shortcuts on Select. |
@@ -248,6 +249,8 @@ In Ruby / Sapphire, the battle move menu uses the ▶ arrow of FireRed / LeafGre
 | Box Exclusive | The PC D-pad stays inside the current box. |
 | Decapitalize Words | Pokémon, Potion, Brock… instead of all capitals. HP, PP, PC, TMs, HMs, PKMN, XP and the like stay. |
 | Display XP in Party Menu | XP bars in the party screen. |
+| Fast PKMN Center | The nurse just asks "May I heal your Pokémon?". NO: "Thank you, come again!". YES: she heals right away (normal machine animation), then "All done! Thank you, come again!". Pokérus news and Emerald's Gold Card greeting are kept. On by default. |
+| Learn TMs Faster | A Pokémon with 4 moves goes straight to the move list (no "trying to learn" / "delete a move?" / "Poof!" text); you only see "<PKMN> learned <MOVE>!". B on the list cancels quietly. On by default. |
 | Skip FR & LG Recaps | **FireRed / LeafGreen only.** No "Previously on your quest…" when loading. |
 
 ---

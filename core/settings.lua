@@ -21,6 +21,8 @@ return function(mod)
     skip_recaps = true,
     box_exclusive = true,
     party_xp = true,
+    learn_tms_faster = true,
+    fast_pkmn_center = true,
     always_boosted_exp = true,
     decapitalize = true,
     infinite_safari = true,
@@ -95,7 +97,8 @@ return function(mod)
     move_relearning = true,
     no_learn_hms = true,
     tms_forever = true,
-    fairy_type = false, -- set by the future Fairy feature
+    fairy_moves = false, -- MECHANICS > EXTRA TYPES > FAIRY TYPE MOVES
+    fairy_pkmn = false,  -- MECHANICS > EXTRA TYPES > FAIRY TYPE PKMN
     theme_scope = "game", -- "game" | "save"
     start_order = table.concat(S.DEFAULT_ORDER, ","),
     start_icons = "",      -- "KEY=icon,KEY=icon" (CUSTOM ICONS for other mods' items)

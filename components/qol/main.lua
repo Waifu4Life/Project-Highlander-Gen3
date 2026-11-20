@@ -8,7 +8,8 @@
 --   Feebas tiles (always on)                         -> field.lua
 --   Rematch Anyone, Anytime                         -> rematch.lua
 --   Safari Zone: Unlimited Balls, No Running Away   -> safari.lua
---   Decapitalize Words                              -> decap.lua (installed first, from main.lua)
+--   Learn TMs Faster, Fast PKMN Center              -> fast.lua
+--   Decapitalize Words                             -> decap.lua (installed first, from main.lua)
 --
 -- Every patch is installed on its own: if a game module is not loaded yet (or
 -- is missing in some version), only that patch waits for the next install
@@ -41,7 +42,7 @@ return function(ctx)
   ctx.qolPatch = patch
 
   local parts = {}
-  for _, name in ipairs({ "exp", "unlimited_pp", "status_reset", "field", "rematch", "safari" }) do
+  for _, name in ipairs({ "exp", "unlimited_pp", "status_reset", "field", "rematch", "safari", "fast" }) do
     local ok, part = pcall(function() return loadLocal("components/qol/" .. name .. ".lua")(ctx, patch) end)
     if ok and type(part) == "table" then
       parts[#parts + 1] = part

@@ -27,6 +27,7 @@ return function(mod)
   ctx.pokedex = loadLocal("components/pokedex/main.lua")(ctx)
   ctx.typeColors = loadLocal("components/battle_hud/types.lua")
   ctx.battleHud = loadLocal("components/battle_hud/main.lua")(ctx, ctx.typeColors)
+  ctx.extraTypes = loadLocal("components/extra_types/main.lua")(ctx, loadLocal("components/extra_types/data.lua"))
   ctx.borders = loadLocal("components/borders/main.lua")(ctx)
   ctx.shortcuts = loadLocal("components/shortcuts/main.lua")(ctx)
   ctx.fullControl = loadLocal("components/full_control/main.lua")(ctx)
@@ -84,6 +85,9 @@ return function(mod)
     if not okJb and mod.log then mod.log:warn("jukebox: %s", tostring(errJb)) end
     local okFc, errFc = pcall(ctx.fullControl.install)
     if not okFc and mod.log then mod.log:warn("full control: %s", tostring(errFc)) end
+    -- after Fill Kanto / Fill Hoenn / Johto: its Nurse Joy talk wraps theirs
+    local okEt, errEt = pcall(ctx.extraTypes.install)
+    if not okEt and mod.log then mod.log:warn("extra types: %s", tostring(errEt)) end
     ctx.hub.install()
   end
   local ok, err = pcall(install)

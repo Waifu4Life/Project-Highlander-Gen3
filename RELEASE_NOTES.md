@@ -47,8 +47,13 @@ For the five Gen 3 games of G1R Deluxe (FireRed, LeafGreen, Ruby, Sapphire, Emer
 - Item Shortcuts: up to 3 Key Items in a SELECT box in the overworld (FR/LG: Town Map, Bicycle, Itemfinder, Rods, Vs. Seeker, Berry Pouch, TM Case; R/S/E: Acro/Mach Bike, Itemfinder, Rods, Go-Goggles, Devon Scope, Wailmer Pail, Pokéblock Case, Town Map via PokéNav).
 
 ## Battle HUD (Options > Project Highlander > Battle HUD)
-- Colored Move Names: a frame in each move's type colour (Fairy colour ready for later).
+- Colored Move Names: a frame in each move's type colour (including Fairy).
 - Display Enemy HP: the enemy's HP in numbers (singles).
+
+## Extra Types (Options > Mechanics > Extra Types)
+- Fairy Type Moves: Charm, Moonlight and Sweet Kiss become Fairy; TM51–57 (Dazzling Gleam, Disarming Voice, Draining Kiss, Play Rough, Moonblast, Fairy Wind, Baby-Doll Eyes) from an extra Nurse Joy in seven Pokémon Centers (FRLG: Pewter, Route 4, Cerulean, Vermilion, Route 10, Lavender, Celadon; RSE: Petalburg, Dewford, Mauville, Fallarbor, Fortree, Mossdeep, Pacifidlog). Off: moves go back to Normal, the Joys leave, owned TMs stay.
+- Fairy Type PKMN: Gen6 Fairy typings. Fairy is special, with Gen6 matchups.
+- Known limit: removing the mod leaves move ids 401–407 and item ids 651–657 in saves that have them.
 
 ## QOL (Options > Project Highlander > QOL)
 - Always Boosted EXP: every Pokémon gets the traded-Pokémon EXP bonus; obedience and your Trainer ID are unchanged.

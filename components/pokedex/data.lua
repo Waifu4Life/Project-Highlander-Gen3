@@ -212,6 +212,14 @@ return function(ctx)
     local tm = {}
     if Pokemon and type(Pokemon.canLearnTmIndex) == "function" then
       for idx = 0, 57 do
+        -- Extra Types' TM51-57 go after TM50, before the HMs
+        if idx == 50 and ctx.extraTypes then
+          for _, t in ipairs(ctx.extraTypes.tmList()) do
+            if call(Pokemon.canLearnTmItem, sp, t.item) then
+              tm[#tm + 1] = row(("TM%02d"):format(t.number), t.move)
+            end
+          end
+        end
         if call(Pokemon.canLearnTmIndex, sp, idx) then
           local id = tonumber(call(Pokemon.moveFromTmItem, 289 + idx))
           if id and id > 0 then

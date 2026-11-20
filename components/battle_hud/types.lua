@@ -1,5 +1,5 @@
 -- Type colours for COLORED MOVE NAMES (same reference palette as the Gen 1/2
--- Battle HUD). FAIRY is ready for when the Fairy type is switched on.
+-- Battle HUD). FAIRY is the Extra Types part's type (index 23).
 local T = {}
 
 T.COLORS = {
@@ -48,7 +48,8 @@ end
 -- two types' colours (FLYING, POISON...), so the mod draws its own.
 
 T.BY_ID = { [0] = "NORMAL", "FIGHTING", "FLYING", "POISON", "GROUND", "ROCK", "BUG", "GHOST",
-  "STEEL", "MYSTERY", "FIRE", "WATER", "GRASS", "ELECTRIC", "PSYCHIC", "ICE", "DRAGON", "DARK" }
+  "STEEL", "MYSTERY", "FIRE", "WATER", "GRASS", "ELECTRIC", "PSYCHIC", "ICE", "DRAGON", "DARK",
+  [23] = "FAIRY" }
 T.SHORT = { FIGHTING = "FIGHT", ELECTRIC = "ELECTR", PSYCHIC = "PSYCHC", MYSTERY = "???" }
 
 function T.badgeKey(t)
