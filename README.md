@@ -12,7 +12,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 > [!NOTE]
 > Project Highlander Gen3 only runs in the five Gen 3 games. For Red / Blue / Yellow / Gold / Silver / Crystal, use [Project Highlander Gen1+2](https://github.com/Waifu4Life/Project-Highlander-Gen1-2), a separate mod.
 
-**Current release:** 1.85.0 (BETA)
+**Current release:** 1.96.0 (BETA)
 **Requires:** G1R Deluxe 0.3.89 or newer (built against 0.3.97)
 
 ---
@@ -29,6 +29,7 @@ A modern Start Menu, PC, Party, Bag and Pokédex upgrades, quality-of-life optio
 - [PC](#pc)
 - [Pokédex](#pokédex)
 - [Battle Screen](#battle-screen)
+- [Extra Types](#extra-types)
 - [Overworld Screen](#overworld-screen)
 - [Safari Zone Cheats](#safari-zone-cheats)
 - [Other System Settings](#other-system-settings)
@@ -65,6 +66,7 @@ Every setting is **On** out of the box. Multiple-choice settings start on **Auto
 | Jukebox Button | None (set it in Full Control) |
 | Status Condition Reset | Off |
 | Unlimited PP | Off |
+| Fairy Type Moves / Fairy Type PKMN | Off |
 
 Rows that don't concern the game you're playing are hidden (FireRed / LeafGreen-only rows don't show in Hoenn, Ruby / Sapphire-only rows don't show in Emerald, and so on).
 
@@ -222,6 +224,25 @@ The order, icons, hidden items and names are kept **per save** (in the save file
 
 In Ruby / Sapphire, the battle move menu uses the ▶ arrow of FireRed / LeafGreen / Emerald instead of Ruby's box cursor.
 
+## Extra Types
+
+Adds the **Fairy** type, with Gen6 matchups. Fairy moves are special. Both options are Off by default.
+
+| Option | What it does |
+|---|---|
+| Fairy Type Moves | Charm, Moonlight and Sweet Kiss become Fairy, and seven Fairy TMs come in: **TM51** Dazzling Gleam, **TM52** Disarming Voice, **TM53** Draining Kiss (heals 3/4 of the damage), **TM54** Play Rough, **TM55** Moonblast, **TM56** Fairy Wind (Fairy-type Pokémon only) and **TM57** Baby-Doll Eyes. |
+| Fairy Type PKMN | Gen6 Fairy typings: the Clefairy, Jigglypuff, Togepi, Snubbull and Marill lines, Mr. Mime, the Ralts line (Psychic / Fairy), Azurill (Normal / Fairy), Mawile (Steel / Fairy) and more. |
+
+An extra Nurse Joy, standing on the floor just right of the PC, gives each TM once. Later visits: "Have a nice day!".
+
+- **FireRed / LeafGreen:** Pewter TM51, Route 4 TM57, Cerulean TM52, Vermilion TM55, Route 10 TM53, Lavender TM54, Celadon TM56.
+- **Ruby / Sapphire / Emerald:** Petalburg TM51 (one step further right, since someone already stands there), Dewford TM52, Mauville TM53, Fallarbor TM57, Fortree TM54, Mossdeep TM55, Pacifidlog TM56.
+
+The Fairy TMs show in the TM Case / Bag, the Pokédex Moves tab and the Summary screen. Turning Fairy Type Moves off makes the moves Normal again and the extra Nurse Joys leave. TMs you already have stay and still teach, and turning it back on never gives a second copy.
+
+> [!NOTE]
+> The new moves (ids 401–407) and TMs (items 651–657) are mod content. Removing the mod from a save that has them leaves those ids unknown to the base game.
+
 ## Overworld Screen
 
 | Option | What it does |
@@ -250,7 +271,7 @@ In Ruby / Sapphire, the battle move menu uses the ▶ arrow of FireRed / LeafGre
 | Decapitalize Words | Pokémon, Potion, Brock… instead of all capitals. HP, PP, PC, TMs, HMs, PKMN, XP and the like stay. |
 | Display XP in Party Menu | XP bars in the party screen. |
 | Fast PKMN Center | The nurse just asks "May I heal your Pokémon?". NO: "Thank you, come again!". YES: she heals right away (normal machine animation), then "All done! Thank you, come again!". Pokérus news and Emerald's Gold Card greeting are kept. On by default. |
-| Learn TMs Faster | A Pokémon with 4 moves goes straight to the move list (no "trying to learn" / "delete a move?" / "Poof!" text); you only see "<PKMN> learned <MOVE>!". B on the list cancels quietly. On by default. |
+| Learn TMs Faster | A Pokémon with 4 moves goes straight to the move list (no "trying to learn" / "delete a move?" / "Poof!" text); you only see "<PKMN> learned <MOVE>!". B on the list cancels quietly, and an HM move still can't be forgotten. Level-up moves and the Move Tutor are unchanged. On by default. |
 | Skip FR & LG Recaps | **FireRed / LeafGreen only.** No "Previously on your quest…" when loading. |
 
 ---
