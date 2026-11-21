@@ -143,7 +143,6 @@ A two-column, five-row Start Menu with flat coloured icon buttons.
 - **Ruby / Sapphire / Emerald:** the same, plus PokéNav.
 - **Options pages as items:** Project Highlander (as *Highlander*) and every other mod's page in the Options menu (Wilds of Hoenn, for example) become Start Menu items. They open Options straight on that page, and backing out returns to the Start Menu. They can be sorted, hidden, renamed and given an icon (the Options icon by default).
 - **Items from other mods** (a DexNav entry, for example) get their own tiles. With more than nine items besides Exit, the menu gets a 2nd page (or more): Up / Down go from page to page and wrap round, Left / Right switch column, and the page (e.g. 1/2) shows at the top right.
-- **Exit** always stays bottom-right of the last page.
 - **Save** stays in the Start Menu: the save prompts appear on top of it and you're back on Save afterwards.
 - **Select** on the Start Menu opens the Sort Menu.
 
