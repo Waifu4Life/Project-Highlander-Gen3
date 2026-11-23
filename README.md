@@ -95,7 +95,7 @@ These run whenever the matching screen or event is in play. There is no toggle.
 | Area | What you get |
 |---|---|
 | Party | **Select** quick switch: Select on a Pokémon, then A or Select on another swaps them, B cancels. |
-| Party A-menu | Always in this order: Summary, Role, Switch, Item, Relearn, Rename, HM moves, TM moves, Cancel. Works with Wilds of Hoenn's Role row. More than 8 entries scroll with a scroll bar. |
+| Party A-menu | Always in this order: Summary, Role, Switch, Item, Rename, HM moves, TM moves, Cancel. Works with Wilds of Hoenn's Role row. More than 8 entries scroll with a scroll bar. |
 | Bag | 255-item limit with an **Items x/255** counter (red when full). In FireRed / LeafGreen the TM Case and Berry Pouch count as one item each. |
 | Bag | **Start** opens a Sort By menu. **Select** opens the TM Case (FireRed / LeafGreen, outside battle). |
 | PC | **Select** toggles Auto-Grab. **Multiple** in the A-menu moves a group between boxes or in and out of the party. |
