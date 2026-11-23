@@ -100,7 +100,7 @@ These run whenever the matching screen or event is in play. There is no toggle.
 | Bag | **Start** opens a Sort By menu. **Select** opens the TM Case (FireRed / LeafGreen, outside battle). |
 | PC | **Select** toggles Auto-Grab. **Multiple** in the A-menu moves a group between boxes or in and out of the party. |
 | Pokédex | **Select** on an entry opens a 2nd screen with Stats / Family / Moves / Location tabs. |
-| Options | **Button Mode** is locked on **LR**, so L and R always work as L and R. |
+| Options | When Box Exclusive is On, **Button Mode** is locked on **LR**, so L and R always work as L and R. |
 | Select box | The Item Shortcuts / Instant TMs/HMs box follows your Start Menu theme. |
 | Shops | After the Champion, Lilycove Dept. Store 2F (Ruby / Sapphire / Emerald) and the Celadon Dept. Store stone clerk (FireRed / LeafGreen) also sell Metal Coat, King's Rock, Dragon Scale and Up-Grade at $20,000 each. |
 | Launch | The game window takes focus when launched from a frontend, Playnite or a shortcut. |
